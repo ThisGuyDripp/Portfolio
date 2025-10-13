@@ -282,7 +282,6 @@
             box-shadow: 0 30px 60px rgba(212, 175, 55, 0.2);
         }
 
-        /* FIX: This pseudo-element was capturing clicks. pointer-events: none solves it. */
         .portfolio-item::before {
             content: '';
             position: absolute;
@@ -294,10 +293,9 @@
             opacity: 0;
             transition: var(--transition);
             z-index: 2;
-            pointer-events: none; /* This is the fix! */
+            pointer-events: none;
         }
         
-        /* ADDITION: Play icon overlay for better UX */
         .portfolio-item .play-icon {
             position: absolute;
             top: 50%;
@@ -309,7 +307,7 @@
             opacity: 0;
             transition: all 0.3s ease;
             pointer-events: none;
-            padding-bottom: 15%; /* Adjust icon position relative to container aspect ratio */
+            padding-bottom: 15%; 
         }
         
         .portfolio-item:hover .play-icon {
@@ -318,7 +316,7 @@
         }
         
         .portfolio-item.short-form .play-icon {
-            padding-bottom: 0; /* No adjustment needed for vertical videos */
+            padding-bottom: 0;
         }
 
         .portfolio-item:hover::before {
@@ -553,8 +551,9 @@
             header h1 {
                 font-size: 1.5rem;
             }
+            /* IMPROVEMENT: A proper hamburger menu is recommended here for better mobile UX */
             .nav-links {
-                display: none; /* Simple hiding for now, could be replaced with a hamburger menu */
+                display: none; 
             }
             
             .hero h2 {
@@ -641,8 +640,8 @@
                 <h2 class="section-title">About Me</h2>
                 <div class="about-content">
                     <div class="about-text">
-                        <p>I'm a passionate videographer and editor with experience in academic and organizational settings. Looking back at my journey, I recognize I still have much to learn, but with each project, I've grown and improved. Though my work may not yet reach commercial standards, my dedication to the craft drives me to continually enhance my skills.</p>
-                        <p>I hope this portfolio showcases my progress and potential, and I'm excited for the opportunity to work on your next event!</p>
+                        <p>I'm a passionate videographer and editor with experience in academic and organizational settings. My journey is one of continuous learning, and with each project, I strive to grow, improve, and refine my skills. My dedication to the craft drives me to continually enhance my storytelling abilities.</p>
+                        <p>This portfolio showcases my progress and potential. I'm excited for the opportunity to bring my passion and commitment to your next event!</p>
                     </div>
                 </div>
             </div>
@@ -653,14 +652,22 @@
                 <h2 class="section-title">Portfolio</h2>
                 
                 <div class="experience-block">
-                    <h3>Experimental & Micro-Content</h3>
-                    <p class="duration">Innovative Short-Form Videos</p>
-                    
+                    <h3>Short-Form & Vertical Video</h3>
+                    <p class="duration">Engaging Content for Social Media</p>
                     <div class="portfolio-grid">
-                        <div class="portfolio-item">
+                        <div class="portfolio-item short-form">
                             <div class="video-container short-form">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="Creative Short-Form Video" src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                            <div class="video-title">
+                                <h4>Creative Edit</h4>
+                            </div>
+                        </div>
+                        <div class="portfolio-item short-form">
+                            <div class="video-container short-form">
+                                <div class="play-icon"><i class="fas fa-play"></i></div>
+                                <iframe class="video-iframe" title="60 Second Interview Video" src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>60 Second Interview</h4>
@@ -669,24 +676,7 @@
                         <div class="portfolio-item">
                             <div class="video-container">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-                            </div>
-                            <div class="video-title">
-                                <h4>VAMH Test Trial Edit</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="experience-block">
-                    <h3>Product Advertisement</h3>
-                    <p class="duration">3-Minute Commercial Content</p>
-                    
-                    <div class="portfolio-grid">
-                        <div class="portfolio-item">
-                            <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="Product Advertisement Video" src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>Product Advertisement</h4>
@@ -694,16 +684,15 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="experience-block">
                     <h3>Teaser Trailers</h3>
                     <p class="duration">Promotional Preview Content</p>
-                    
                     <div class="portfolio-grid">
                         <div class="portfolio-item">
                             <div class="video-container">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="Typography Teaser Trailer" src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>Typography Teaser Trailer</h4>
@@ -712,7 +701,7 @@
                         <div class="portfolio-item">
                             <div class="video-container">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="Pageant Teaser Trailer" src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>Pageant Teaser Trailer</h4>
@@ -724,12 +713,11 @@
                 <div class="experience-block">
                     <h3>Music Video Spoof</h3>
                     <p class="duration">Creative Parody Content</p>
-                    
                     <div class="portfolio-grid">
                         <div class="portfolio-item">
                             <div class="video-container">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1ZkTAgBcmDuX_h89aVtx_JDqaVavEevm_/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="Music Video Spoof" src="https://drive.google.com/file/d/1ZkTAgBcmDuX_h89aVtx_JDqaVavEevm_/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>Music Video Spoof</h4>
@@ -746,7 +734,7 @@
                         <div class="portfolio-item">
                             <div class="video-container">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="SDE School Event" src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>SDE School Event</h4>
@@ -755,7 +743,7 @@
                         <div class="portfolio-item">
                             <div class="video-container">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="SDE Orientation Program" src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>SDE Orientation Program</h4>
@@ -772,7 +760,7 @@
                         <div class="portfolio-item">
                             <div class="video-container">
                                 <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" title="PRC and CHED Visit, Promotional Video of BS Geology Program at NORSU" src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
                             <div class="video-title">
                                 <h4>PRC and CHED Visit, Promotional Video of BS Geology Program at NORSU</h4>
@@ -877,19 +865,19 @@
                 }
             });
 
-            // Header scroll effect
+            // IMPROVEMENT: Combined scroll event listeners for better performance and readability.
             const header = document.getElementById('header');
+            const backToTopButton = document.querySelector('.back-to-top');
+            
             window.addEventListener('scroll', () => {
+                // Header scroll effect
                 if (window.scrollY > 50) {
                     header.classList.add('scrolled');
                 } else {
                     header.classList.remove('scrolled');
                 }
-            });
-            
-            // Back to top button visibility
-            const backToTopButton = document.querySelector('.back-to-top');
-            window.addEventListener('scroll', () => {
+
+                // Back to top button visibility
                 if (window.scrollY > 300) {
                     backToTopButton.classList.add('visible');
                 } else {
@@ -900,5 +888,3 @@
     </script>
 </body>
 </html>
-
-
