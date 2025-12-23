@@ -3,21 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ershad Elmaco - Videographer & Editor Portfolio</title>
+    
+    <!-- SEO & Social Sharing Tags -->
+    <title>Ershad Elmaco | Professional Videographer & Editor</title>
+    <meta name="description" content="Portfolio of Ershad Elmaco, a professional videographer and editor specializing in cinematic storytelling, commercial ads, and social media content.">
+    <meta name="keywords" content="Videographer, Video Editor, Premiere Pro, CapCut, Cinematography, Filmmaker, Portfolio">
+    <meta name="author" content="Ershad Elmaco">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourportfolio.com/">
+    <meta property="og:title" content="Ershad Elmaco - Visual Storyteller">
+    <meta property="og:description" content="Capturing moments and creating stories. View my latest video work and edits.">
+    <meta property="og:image" content="https://placehold.co/1200x630/1a1a1a/d4af37?text=Ershad+Elmaco+Portfolio">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Ershad Elmaco - Visual Storyteller">
+    <meta property="twitter:description" content="Capturing moments and creating stories. View my latest video work and edits.">
+    <meta property="twitter:image" content="https://placehold.co/1200x630/1a1a1a/d4af37?text=Ershad+Elmaco+Portfolio">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary: #0a0a0a;
+            --primary: #050505;
             --secondary: #141414;
             --accent: #d4af37;
+            --accent-glow: rgba(212, 175, 55, 0.5);
             --accent-hover: #c19a2a;
             --light: #f8f8f8;
             --text: #e0e0e0;
-            --card-bg: #1a1a1a;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
             --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -37,6 +59,18 @@
             line-height: 1.6;
             background-color: var(--primary);
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6; /* Subtle blend */
         }
 
         h1, h2, h3, h4 {
@@ -51,24 +85,25 @@
             padding: 0 15px;
         }
 
-        /* Header */
+        /* Header & Navigation */
         header {
-            background: rgba(10, 10, 10, 0.8);
+            background: rgba(5, 5, 5, 0.3);
             color: var(--light);
             padding: 1.5rem 0;
-            text-align: center;
             position: sticky;
             top: 0;
             z-index: 1000;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.05);
         }
 
         header.scrolled {
             padding: 1rem 0;
+            background: rgba(5, 5, 5, 0.85);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
         }
 
         header .container {
@@ -79,19 +114,26 @@
 
         header h1 {
             font-size: 1.8rem;
-            background: linear-gradient(to right, var(--light), var(--accent));
+            background: linear-gradient(to right, #fff, var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
         .nav-links a {
             color: var(--text);
             text-decoration: none;
-            margin: 0 1rem;
             font-weight: 500;
             position: relative;
             transition: color 0.3s ease;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .nav-links a::after {
@@ -104,49 +146,79 @@
             transform: translateX(-50%);
             background-color: var(--accent);
             transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--accent);
         }
 
         .nav-links a:hover {
             color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
         }
 
         .nav-links a:hover::after {
             width: 100%;
         }
 
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light);
+            z-index: 1001;
+        }
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--light);
-            padding: 6rem 0;
+            padding: 8rem 0 6rem;
             text-align: center;
-            position: relative;
             display: flex;
             align-items: center;
-            min-height: 90vh;
+            min-height: 85vh;
+            position: relative;
         }
         
         .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
         .hero h2 {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, var(--accent), var(--light));
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--light);
+            line-height: 1.2;
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .hero h2 span {
+            color: var(--accent);
+            background: linear-gradient(to right, var(--accent), #fbf5b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .hero p {
-            font-size: 1.3rem;
+        /* Typewriter Effect Styles */
+        .typewriter {
+            font-size: 1.5rem;
+            min-height: 2rem;
             margin-bottom: 2.5rem;
-            opacity: 0.9;
+            color: rgba(255,255,255,0.8);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: var(--accent);
+            animation: blink 1s infinite;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         .button-group {
@@ -160,40 +232,58 @@
             display: inline-block;
             padding: 1rem 2.5rem;
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-            color: var(--primary);
+            color: #000;
             text-decoration: none;
             font-weight: 700;
             border-radius: 50px;
             transition: var(--transition);
             border: none;
             cursor: pointer;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
             text-transform: uppercase;
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
         }
 
         .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--accent);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--accent);
             color: var(--accent);
             box-shadow: none;
+            backdrop-filter: blur(5px);
         }
 
         .btn-secondary:hover {
-            background: rgba(212, 175, 55, 0.1);
+            background: var(--accent);
+            color: #000;
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
         }
 
-        /* Sections */
-        .about, .portfolio, .contact {
-            padding: 6rem 0;
+        /* Common Section Styles */
+        .section-padding {
+            padding: 7rem 0;
         }
 
         .section-title {
@@ -202,6 +292,7 @@
             margin-bottom: 4rem;
             position: relative;
             color: var(--light);
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .section-title::after {
@@ -210,65 +301,232 @@
             bottom: -15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
+            width: 60px;
+            height: 3px;
             background: var(--accent);
-            border-radius: 2px;
+            box-shadow: 0 0 15px var(--accent);
         }
 
-        /* About Section */
-        .about-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
+        /* About & Skills */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .about-text {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            border: var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
         .about-text p {
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Skills Section Styles */
+        .skills-container h3 {
+            color: var(--light);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .skill-tag {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: var(--text);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+        
+        .skill-tag i {
+            color: var(--accent);
+        }
+
+        .skill-tag:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: rgba(30,30,30,0.9);
+        }
+
+        /* Workflow Timeline */
+        .workflow-section {
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .timeline-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
+        }
+
+        .timeline-step {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--secondary);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--accent);
+            transition: var(--transition);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .timeline-step:hover .step-icon {
+            background: var(--accent);
+            color: var(--primary);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .step-title {
+            color: var(--light);
             font-size: 1.2rem;
-            opacity: 0.85;
-            line-height: 1.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            padding: 0 1rem;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: var(--glass-border);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            background: rgba(30, 30, 30, 0.7);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .service-card h4 {
+            color: var(--light);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            font-size: 0.95rem;
+            opacity: 0.8;
         }
 
         /* Portfolio Section */
         .experience-block {
-            margin-bottom: 5rem;
+            margin-bottom: 6rem;
         }
         
         .experience-block h3 {
-            font-size: 2.2rem;
-            margin-bottom: 1rem;
+            font-size: 2rem;
             color: var(--light);
             text-align: center;
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .duration {
             color: var(--accent);
-            font-weight: 600;
-            margin-bottom: 3rem;
             display: block;
             text-align: center;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 3rem;
+            opacity: 0.8;
         }
 
         .portfolio-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2.5rem;
-            margin-top: 2rem;
         }
 
         .portfolio-item {
-            background: var(--card-bg);
-            border-radius: 16px;
+            background: var(--secondary);
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             transition: var(--transition);
             position: relative;
             opacity: 0;
             transform: translateY(30px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            border: var(--glass-border);
         }
         
         .portfolio-item.visible {
@@ -276,64 +534,23 @@
             transform: translateY(0);
         }
 
-
         .portfolio-item:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(212, 175, 55, 0.2);
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            border-color: rgba(212, 175, 55, 0.4);
         }
 
-        .portfolio-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, transparent 100%);
-            opacity: 0;
-            transition: var(--transition);
-            z-index: 2;
-            pointer-events: none;
-        }
-        
-        .portfolio-item .play-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            font-size: 4rem;
-            color: rgba(255, 255, 255, 0.8);
-            z-index: 3;
-            opacity: 0;
-            transition: all 0.3s ease;
-            pointer-events: none;
-            padding-bottom: 15%; 
-        }
-        
-        .portfolio-item:hover .play-icon {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        
-        .portfolio-item.short-form .play-icon {
-            padding-bottom: 0;
-        }
-
-        .portfolio-item:hover::before {
-            opacity: 1;
-        }
-
+        /* Video Container */
         .video-container {
             position: relative;
             width: 100%;
             height: 0;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            padding-bottom: 56.25%; /* 16:9 */
             background-color: #000;
-            overflow: hidden;
         }
 
         .video-container.short-form {
-            padding-bottom: 177.78%; /* 9:16 aspect ratio for vertical videos */
+            padding-bottom: 177.78%; /* 9:16 */
         }
 
         .video-iframe {
@@ -343,26 +560,47 @@
             width: 100%;
             height: 100%;
             border: none;
-            transition: var(--transition);
             z-index: 1;
         }
-
-        .portfolio-item:hover .video-iframe {
-            transform: scale(1.05);
-        }
-
-        .video-title {
+        
+        /* Portfolio Content & Tags */
+        .portfolio-content {
             padding: 1.5rem;
-            text-align: center;
-            background: var(--card-bg);
-            z-index: 2;
+            background: rgba(20, 20, 20, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.05);
             position: relative;
+            z-index: 2;
         }
 
-        .video-title h4 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
+        .portfolio-content h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
             color: var(--light);
+            line-height: 1.4;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tag:hover {
+            background: var(--accent);
+            color: var(--primary);
+            border-color: var(--accent);
         }
 
         /* Contact Section */
@@ -370,14 +608,16 @@
             max-width: 600px;
             margin: 0 auto;
             text-align: center;
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: var(--glass-border);
         }
-
-        .contact-methods {
-            display: flex;
-            justify-content: center;
-            gap: 2.5rem;
-            margin-top: 2.5rem;
-            flex-wrap: wrap;
+        
+        .contact-content p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
         }
 
         .contact-method a {
@@ -389,131 +629,45 @@
             text-decoration: none;
             transition: var(--transition);
             font-weight: 600;
-            padding: 1rem 2rem;
-            border: 2px solid transparent;
+            padding: 1rem 2.5rem;
+            border: 1px solid var(--accent);
             border-radius: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            margin-top: 2rem;
         }
         
         .contact-method a:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-            background-color: rgba(212, 175, 55, 0.1);
+            background-color: var(--accent);
+            color: var(--primary);
+            box-shadow: 0 0 30px var(--accent-glow);
             transform: translateY(-5px);
-        }
-
-        .contact-method i {
-            color: var(--accent);
-            font-size: 1.8rem;
         }
 
         /* Footer */
         footer {
-            background: var(--secondary);
+            background: #000;
             color: var(--text);
             text-align: center;
             padding: 3rem 0;
-            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            z-index: 1;
         }
 
-        .social-links {
-            margin-bottom: 1.5rem;
-        }
-        
         .social-links a {
-            color: var(--text);
+            color: rgba(255,255,255,0.6);
             font-size: 1.5rem;
             margin: 0 1rem;
-            transition: color 0.3s ease, transform 0.3s ease;
+            transition: var(--transition);
+            display: inline-block;
         }
         
         .social-links a:hover {
             color: var(--accent);
-            transform: translateY(-3px);
+            transform: translateY(-3px) scale(1.2);
         }
 
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.95);
-            padding: 2rem;
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            margin: 5% auto;
-            padding: 2.5rem;
-            border-radius: 16px;
-            max-width: 900px;
-            position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 1px solid var(--accent);
-        }
-
-        .close {
-            color: var(--accent);
-            float: right;
-            font-size: 32px;
-            font-weight: bold;
-            cursor: pointer;
-            position: absolute;
-            right: 1.5rem;
-            top: 1rem;
-            transition: var(--transition);
-        }
-
-        .close:hover {
-            color: var(--accent-hover);
-            transform: rotate(90deg);
-        }
-
-        .video-links h4 {
-            margin: 1.8rem 0 1.2rem 0;
-            color: var(--light);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            padding-bottom: 0.5rem;
-        }
-
-        .video-links ul {
-            list-style: none;
-            padding-left: 1.5rem;
-        }
-
-        .video-links li {
-            margin-bottom: 1rem;
-            padding-left: 1.8rem;
-            position: relative;
-            line-height: 1.5;
-        }
-
-        .video-links li::before {
-            content: '▶';
-            position: absolute;
-            left: 0;
-            color: var(--accent);
-            font-size: 1.2rem;
-        }
-
-        .video-links a {
-            color: var(--text);
-            text-decoration: none;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .video-links a:hover {
-            color: var(--accent);
-            text-decoration: underline;
-        }
-        
-        /* Back to Top Button */
+        /* Back to Top */
         .back-to-top {
             position: fixed;
             bottom: 2rem;
@@ -531,92 +685,154 @@
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
 
         .back-to-top.visible {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0);
         }
         
         .back-to-top:hover {
+            transform: translateY(-5px);
             background-color: var(--accent-hover);
-            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 5% auto;
+            padding: 2.5rem;
+            border-radius: 16px;
+            max-width: 800px;
+            position: relative;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+        }
+
+        .close {
+            color: var(--accent);
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .close:hover {
+            transform: rotate(90deg);
+            color: #fff;
+        }
+
+        .video-links li {
+            margin-bottom: 1rem;
+            color: var(--light);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 0.5rem;
+        }
+
+        .video-links a {
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .video-links a:before {
+            content: '\f04b';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+
+        .video-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.5rem;
+            .menu-toggle {
+                display: block;
             }
-            /* IMPROVEMENT: A proper hamburger menu is recommended here for better mobile UX */
+
             .nav-links {
-                display: none; 
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: rgba(10,10,10,0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                text-align: center;
+                transform: translateY(-150%);
+                transition: transform 0.4s ease;
+                border-bottom: 1px solid var(--accent);
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero h2 { font-size: 2.5rem; }
+            .section-title { font-size: 2.2rem; }
+            
+            .timeline-container::before {
+                display: none;
             }
             
-            .hero h2 {
-                font-size: 2.4rem;
-            }
-            
-            .section-title {
-                font-size: 2.2rem;
+            .timeline-container {
+                flex-direction: column;
+                gap: 3rem;
             }
             
             .portfolio-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .contact-methods {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .button-group {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h2 {
-                font-size: 2rem;
-            }
-            
-            .btn {
-                padding: 0.8rem 2rem;
-                font-size: 1rem;
-                width: 100%;
-            }
-            
-            .video-title h4 {
-                font-size: 1.1rem;
-            }
-            
-            .modal-content {
-                padding: 1.5rem;
-                margin: 10% auto;
-            }
-            
-            .back-to-top {
-                bottom: 1rem;
-                right: 1rem;
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
         }
     </style>
 </head>
 <body>
+    <!-- JavaScript Driven Background -->
+    <canvas id="bg-canvas"></canvas>
+
     <header id="header">
         <div class="container">
             <h1>Ershad A. Elmaco</h1>
-            <nav class="nav-links">
-                <a href="#about">About</a>
-                <a href="#portfolio">Portfolio</a>
-                <a href="#contact">Contact</a>
+            <div class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <nav class="nav-links" id="nav-links">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#workflow" class="nav-link">Workflow</a>
+                <a href="#portfolio" class="nav-link">Portfolio</a>
+                <a href="#contact" class="nav-link">Contact</a>
             </nav>
         </div>
     </header>
@@ -625,161 +841,343 @@
         <section class="hero">
             <div class="container">
                 <div class="hero-content">
-                    <h2>Capturing Moments, Creating Stories</h2>
-                    <p>Welcome to my portfolio showcasing my work as a videographer and editor.</p>
+                    <h2>Capturing Moments<br><span>Creating Stories</span></h2>
+                    <!-- Typing Animation Container -->
+                    <div class="typewriter">
+                        I am a <span id="typing-text"></span><span class="cursor"></span>
+                    </div>
                     <div class="button-group">
-                        <a href="#portfolio" class="btn">View My Work</a>
-                        <button class="btn btn-secondary" id="facebookButton">Facebook Video Archive</button>
+                        <a href="#portfolio" class="btn">View Selected Works</a>
+                        <button class="btn btn-secondary" id="facebookButton"><i class="fab fa-facebook-square"></i> Archives</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="about">
+        <!-- About & Skills Section -->
+        <section id="about" class="section-padding">
             <div class="container">
                 <h2 class="section-title">About Me</h2>
-                <div class="about-content">
+                <div class="about-grid">
                     <div class="about-text">
-                        <p>I'm a passionate videographer and editor with experience in academic and organizational settings. My journey is one of continuous learning, and with each project, I strive to grow, improve, and refine my skills. My dedication to the craft drives me to continually enhance my storytelling abilities.</p>
-                        <p>This portfolio showcases my progress and potential. I'm excited for the opportunity to bring my passion and commitment to your next event!</p>
+                        <p>I'm a passionate videographer and editor with extensive experience in academic and organizational settings. My journey is one of continuous evolution—treating every frame as a canvas.</p>
+                        <p>I specialize in creating clean, engaging edits that retain audience attention. Whether it's a fast-paced vertical video for social media or a cinematic event highlight, I bring dedication and creativity to every timeline.</p>
+                    </div>
+                    
+                    <div class="skills-container">
+                        <h3><i class="fas fa-layer-group"></i> Tech Stack</h3>
+                        <div class="skill-tags">
+                            <div class="skill-tag"><i class="fas fa-video"></i> Premiere Pro</div>
+                            <div class="skill-tag"><i class="fas fa-photo-video"></i> CapCut</div>
+                            <div class="skill-tag"><i class="fas fa-microphone-alt"></i> Audition</div>
+                            <div class="skill-tag"><i class="fas fa-camera-retro"></i> Cinematography</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="portfolio" class="portfolio">
+        <!-- Services Section -->
+        <section id="services" class="section-padding" style="position: relative;">
             <div class="container">
-                <h2 class="section-title">Portfolio</h2>
+                <h2 class="section-title">My Services</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-film"></i></div>
+                        <h4>Video Editing</h4>
+                        <p>Professional cutting, pacing, and storytelling for both long-form and short-form content.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-eye"></i></div>
+                        <h4>Color Grading</h4>
+                        <p>Enhancing visuals with color correction and stylistic grading to match the desired mood.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-wave-square"></i></div>
+                        <h4>Sound Design</h4>
+                        <p>Audio mixing, sound effects, and voiceover synchronization for immersive experiences.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <h4>Social Media Reels</h4>
+                        <p>Optimized vertical content designed to maximize engagement on TikTok, Reels, and Shorts.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Workflow Timeline (New Feature) -->
+        <section id="workflow" class="workflow-section">
+            <div class="container">
+                <h2 class="section-title">My Workflow</h2>
+                <div class="timeline-container">
+                    <div class="timeline-step">
+                        <div class="step-icon"><i class="far fa-comments"></i></div>
+                        <h4 class="step-title">Consultation</h4>
+                        <p class="step-desc">Understanding your vision and objectives.</p>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-icon"><i class="fas fa-video"></i></div>
+                        <h4 class="step-title">Production</h4>
+                        <p class="step-desc">Filming with high-quality equipment.</p>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-icon"><i class="fas fa-laptop-code"></i></div>
+                        <h4 class="step-title">Editing</h4>
+                        <p class="step-desc">Cutting, coloring, and sound design.</p>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-icon"><i class="far fa-check-circle"></i></div>
+                        <h4 class="step-title">Delivery</h4>
+                        <p class="step-desc">Final export in your desired formats.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="section-padding">
+            <div class="container">
+                <h2 class="section-title">Selected Works</h2>
                 
+                <!-- UGC Content -->
                 <div class="experience-block">
-                    <h3>Short-Form & Vertical Video</h3>
-                    <p class="duration">Engaging Content for Social Media</p>
+                    <h3>UGC Content</h3>
+                    <p class="duration">Authentic & Engaging</p>
+                    <div class="portfolio-grid">
+                        <div class="portfolio-item">
+                            <div class="video-container">
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1CNkvI6jGOpPQLFkLz7UoSICCAc6XtCr9/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                            <div class="portfolio-content">
+                                <h4>UGC Feature 1</h4>
+                                <div class="tags">
+                                    <span class="tag">Editing</span>
+                                    <span class="tag">Social Media</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portfolio-item">
+                            <div class="video-container">
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1rOVqPB5pyR0jz5_kGmxqTsSQZTHy9c8T/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                            <div class="portfolio-content">
+                                <h4>UGC Feature 2</h4>
+                                <div class="tags">
+                                    <span class="tag">Editing</span>
+                                    <span class="tag">Sound</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YouTube Automation -->
+                <div class="experience-block">
+                    <h3>YouTube Automation</h3>
+                    <p class="duration">High Retention Editing</p>
+                    <div class="portfolio-grid">
+                        <div class="portfolio-item">
+                            <div class="video-container">
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1t98x33a-Uv7AuFvYyvCzazxoIJK41L97/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                            <div class="portfolio-content">
+                                <h4>Automation Reel</h4>
+                                <div class="tags">
+                                    <span class="tag">Motion Graphics</span>
+                                    <span class="tag">Stock Footage</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dubbing -->
+                <div class="experience-block">
+                    <h3>Dubbing & Localization</h3>
+                    <p class="duration">Audio Synchronization</p>
+                    <div class="portfolio-grid">
+                        <div class="portfolio-item">
+                            <div class="video-container">
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/19nRZfuvxOezmaldEeP8ILRTVQHC-jEYF/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                            <div class="portfolio-content">
+                                <h4>Language Dub 1</h4>
+                                <div class="tags">
+                                    <span class="tag">Audio Sync</span>
+                                    <span class="tag">Mixing</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portfolio-item">
+                            <div class="video-container">
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1zYZ43nUH6XBxfIKAMmBrTZ3oq0ohLoSe/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                            <div class="portfolio-content">
+                                <h4>Language Dub 2</h4>
+                                <div class="tags">
+                                    <span class="tag">Audio Sync</span>
+                                    <span class="tag">Voiceover</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gameplay -->
+                <div class="experience-block">
+                    <h3>YouTube Gameplays</h3>
+                    <p class="duration">Dynamic Gaming Edits</p>
+                    <div class="portfolio-grid">
+                        <div class="portfolio-item">
+                            <div class="video-container">
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1jqaQK6QCrZdSLrNtotXTasvmC3wwoOA-/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                            <div class="portfolio-content">
+                                <h4>Gameplay Highlight</h4>
+                                <div class="tags">
+                                    <span class="tag">High Pace</span>
+                                    <span class="tag">SFX</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shorts/Vertical -->
+                <div class="experience-block">
+                    <h3>Social Media Content</h3>
+                    <p class="duration">Vertical Video Specialist</p>
                     <div class="portfolio-grid">
                         <div class="portfolio-item short-form">
                             <div class="video-container short-form">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="Creative Short-Form Video" src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
+                            <div class="portfolio-content">
                                 <h4>Mentoring</h4>
+                                <div class="tags">
+                                    <span class="tag">Captions</span>
+                                    <span class="tag">Vertical</span>
+                                </div>
                             </div>
                         </div>
                         <div class="portfolio-item short-form">
                             <div class="video-container short-form">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="60 Second Interview Video" src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
+                            <div class="portfolio-content">
                                 <h4>60 Second Interview</h4>
+                                <div class="tags">
+                                    <span class="tag">Interview</span>
+                                    <span class="tag">Cuts</span>
+                                </div>
                             </div>
                         </div>
                          <div class="portfolio-item">
                             <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="Product Advertisement" src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
-                                <h4>Product Advertisement</h4>
+                            <div class="portfolio-content">
+                                <h4>Product Ad</h4>
+                                <div class="tags">
+                                    <span class="tag">Commercial</span>
+                                    <span class="tag">Grading</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Commercials -->
                 <div class="experience-block">
-                    <h3>Long Form</h3>
-                    <p class="duration">3-Minute Commercial Content</p>
+                    <h3>Commercial Projects</h3>
+                    <p class="duration">Brand & Product</p>
                     <div class="portfolio-grid">
                         <div class="portfolio-item">
                             <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="Product Advertisement Video" src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
+                            <div class="portfolio-content">
                                 <h4>Product Advertisement</h4>
+                                <div class="tags">
+                                    <span class="tag">Direction</span>
+                                    <span class="tag">Editing</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Teasers -->
                 <div class="experience-block">
-                    <h3>Teaser Trailers</h3>
-                    <p class="duration">Promotional Preview Content</p>
+                    <h3>Teasers & Trailers</h3>
+                    <p class="duration">Hype Content</p>
                     <div class="portfolio-grid">
                         <div class="portfolio-item">
                             <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="Typography Teaser Trailer" src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
-                                <h4>Typography Teaser Trailer</h4>
+                            <div class="portfolio-content">
+                                <h4>Typography Trailer</h4>
+                                <div class="tags">
+                                    <span class="tag">Kinetic Type</span>
+                                    <span class="tag">After Effects</span>
+                                </div>
                             </div>
                         </div>
                         <div class="portfolio-item">
                             <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="Pageant Teaser Trailer" src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
-                                <h4>Pageant Teaser Trailer</h4>
+                            <div class="portfolio-content">
+                                <h4>Pageant Teaser</h4>
+                                <div class="tags">
+                                    <span class="tag">Event</span>
+                                    <span class="tag">Highlight</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
+                <!-- School/Event -->
                 <div class="experience-block">
-                    <h3>Music Video Spoof</h3>
-                    <p class="duration">Creative Parody Content</p>
-                    <div class="portfolio-grid">
-                        <div class="portfolio-item">
-                            <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="Music Video Spoof" src="https://drive.google.com/file/d/1ZkTAgBcmDuX_h89aVtx_JDqaVavEevm_/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
-                            </div>
-                            <div class="video-title">
-                                <h4>Music Video Spoof</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="experience-block">
-                    <h3>School Event Coverage</h3>
-                    <p class="duration">Academic & Organizational Events</p>
+                    <h3>Event Coverage</h3>
+                    <p class="duration">Academic & Organizational</p>
                     
                     <div class="portfolio-grid">
                         <div class="portfolio-item">
                             <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="SDE School Event" src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
+                            <div class="portfolio-content">
                                 <h4>SDE School Event</h4>
+                                <div class="tags">
+                                    <span class="tag">Same Day Edit</span>
+                                    <span class="tag">Coverage</span>
+                                </div>
                             </div>
                         </div>
                         <div class="portfolio-item">
                             <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="SDE Orientation Program" src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
-                                <h4>SDE Orientation Program</h4>
+                            <div class="portfolio-content">
+                                <h4>Orientation SDE</h4>
+                                <div class="tags">
+                                    <span class="tag">Same Day Edit</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="experience-block">
-                    <h3>University Promotional Videos</h3>
-                    <p class="duration">Official Program Promotions</p>
-                    
-                    <div class="portfolio-grid">
                         <div class="portfolio-item">
                             <div class="video-container">
-                                <div class="play-icon"><i class="fas fa-play"></i></div>
-                                <iframe class="video-iframe" title="PRC and CHED Visit, Promotional Video of BS Geology Program at NORSU" src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                                <iframe class="video-iframe" src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
                             </div>
-                            <div class="video-title">
+                            <div class="portfolio-content">
                                 <h4>PRC and CHED Visit, Promotional Video of BS Geology Program at NORSU</h4>
+                                <div class="tags">
+                                    <span class="tag">Corporate</span>
+                                    <span class="tag">Info</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -787,14 +1185,14 @@
             </div>
         </section>
 
-        <section id="contact" class="contact">
+        <section id="contact" class="section-padding">
             <div class="container">
                 <h2 class="section-title">Get In Touch</h2>
                 <div class="contact-content">
-                    <p>Interested in working together? Feel free to reach out!</p>
+                    <p>Ready to bring your vision to life? Let's discuss your next project.</p>
                     <div class="contact-methods">
                         <div class="contact-method">
-                            <a href="mailto:tatad5289@gmail.com"><i class="fas fa-envelope"></i>tatad5289@gmail.com</a>
+                            <a href="mailto:tatad5289@gmail.com"><i class="fas fa-envelope"></i> tatad5289@gmail.com</a>
                         </div>
                     </div>
                 </div>
@@ -834,7 +1232,157 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // Staggered animation for portfolio items
+            // --- 1. Canvas Background Animation (Fluid Mesh) ---
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let w, h;
+            let particles = [];
+            const particleCount = 40;
+            const connectionDistance = 150;
+            
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * w;
+                    this.y = Math.random() * h;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 2 + 1;
+                    // Gold/Yellowish tints
+                    this.color = `rgba(212, 175, 55, ${Math.random() * 0.3})`; 
+                }
+                
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    
+                    if(this.x < 0 || this.x > w) this.vx *= -1;
+                    if(this.y < 0 || this.y > h) this.vy *= -1;
+                }
+                
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            function initParticles() {
+                particles = [];
+                for(let i=0; i<particleCount; i++){
+                    particles.push(new Particle());
+                }
+            }
+            
+            function animateCanvas() {
+                // Clear with fade effect for trail
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.1)'; // Matches --primary bg
+                ctx.fillRect(0, 0, w, h);
+                
+                particles.forEach((p, index) => {
+                    p.update();
+                    p.draw();
+                    
+                    // Draw connections
+                    for(let j = index; j < particles.length; j++){
+                        const dx = particles[j].x - p.x;
+                        const dy = particles[j].y - p.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        
+                        if(dist < connectionDistance) {
+                            ctx.strokeStyle = `rgba(212, 175, 55, ${1 - dist/connectionDistance * 0.8})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                
+                requestAnimationFrame(animateCanvas);
+            }
+            
+            window.addEventListener('resize', () => {
+                resize();
+                initParticles();
+            });
+            
+            resize();
+            initParticles();
+            animateCanvas();
+
+
+            // --- 2. Typewriter Effect ---
+            const textElement = document.getElementById('typing-text');
+            const words = ["Videographer", "Editor", "Storyteller", "Creator"];
+            let wordIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let typeSpeed = 100;
+
+            function type() {
+                const currentWord = words[wordIndex];
+                
+                if (isDeleting) {
+                    textElement.textContent = currentWord.substring(0, charIndex - 1);
+                    charIndex--;
+                    typeSpeed = 50; // Deleting speed
+                } else {
+                    textElement.textContent = currentWord.substring(0, charIndex + 1);
+                    charIndex++;
+                    typeSpeed = 150; // Typing speed
+                }
+
+                if (!isDeleting && charIndex === currentWord.length) {
+                    isDeleting = true;
+                    typeSpeed = 2000; // Pause at end of word
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    wordIndex = (wordIndex + 1) % words.length;
+                    typeSpeed = 500; // Pause before next word
+                }
+
+                setTimeout(type, typeSpeed);
+            }
+            
+            // Start typing
+            setTimeout(type, 1000);
+
+
+            // --- 3. UI Interactions (Mobile Menu, Modal, Scroll) ---
+            const menuToggle = document.getElementById('mobile-menu');
+            const navLinks = document.getElementById('nav-links');
+            const navItems = document.querySelectorAll('.nav-link');
+
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = menuToggle.querySelector('i');
+                if (navLinks.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+
+            // Intersection Observer
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
@@ -844,22 +1392,17 @@
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const items = entry.target.querySelectorAll('.portfolio-item');
-                        items.forEach((item, index) => {
-                            setTimeout(() => {
-                                item.classList.add('visible');
-                            }, index * 150); // Stagger delay
-                        });
+                        entry.target.classList.add('visible');
                         observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
 
-            document.querySelectorAll('.experience-block').forEach(block => {
-                observer.observe(block);
+            document.querySelectorAll('.portfolio-item, .service-card, .timeline-step').forEach(item => {
+                observer.observe(item);
             });
 
-            // Modal functionality
+            // Modal
             const modal = document.getElementById('facebookModal');
             const btn = document.getElementById('facebookButton');
             const span = document.querySelector('.modal .close');
@@ -875,25 +1418,18 @@
                     modal.style.display = 'none';
                 }
             }
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modal.style.display === 'block') {
-                    modal.style.display = 'none';
-                }
-            });
 
-            // IMPROVEMENT: Combined scroll event listeners for better performance and readability.
+            // Header & Back To Top
             const header = document.getElementById('header');
             const backToTopButton = document.querySelector('.back-to-top');
             
             window.addEventListener('scroll', () => {
-                // Header scroll effect
                 if (window.scrollY > 50) {
                     header.classList.add('scrolled');
                 } else {
                     header.classList.remove('scrolled');
                 }
 
-                // Back to top button visibility
                 if (window.scrollY > 300) {
                     backToTopButton.classList.add('visible');
                 } else {
@@ -904,4 +1440,3 @@
     </script>
 </body>
 </html>
-
