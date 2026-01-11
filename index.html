@@ -48,10 +48,13 @@
     </script>
     <style>
         /* FIXED: Body background must be transparent for WebGL (z-index: -1) to show through */
+        html {
+            background-color: #050505; /* Solid fallback for repaint glitches */
+        }
         body {
             background-color: transparent; 
             color: #e0e0e0;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevent horizontal scroll on body */
         }
 
         /* WebGL Container - Fixed background */
@@ -63,7 +66,7 @@
             height: 100%;
             z-index: -1;
             pointer-events: none;
-            background-color: #050505; /* Fallback / Base color moved here */
+            background-color: #050505; 
         }
         
         .glass-panel {
@@ -74,10 +77,58 @@
             transition: all 0.3s ease;
         }
 
-        .glass-panel:hover {
-            border-color: rgba(212, 175, 55, 0.3);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-            transform: translateY(-2px);
+        /* Desktop Hover Effects */
+        @media (hover: hover) {
+            .glass-panel:hover {
+                border-color: rgba(212, 175, 55, 0.3);
+                box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+                transform: translateY(-2px);
+            }
+            .video-facade:hover .thumbnail-img {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            .video-facade:hover .play-btn {
+                transform: scale(1.1);
+                background-color: #d4af37;
+                color: black;
+                border-color: #d4af37;
+            }
+            .video-facade:hover .preview-bar {
+                width: 100%;
+            }
+            .video-facade .absolute.bg-black\/0:hover {
+                 background-color: rgba(0,0,0,0.2);
+            }
+        }
+
+        /* MOBILE OPTIMIZATION: Fix for "Ghost Buttons" */
+        /* On devices without hover (phones/tablets), force visibility */
+        @media (hover: none) {
+            .play-btn {
+                background-color: #d4af37 !important; /* Always Gold */
+                color: black !important;
+                border-color: #d4af37 !important;
+                transform: scale(1) !important;
+                opacity: 1 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            }
+            
+            /* Always show the overlay slightly darkened so text is readable */
+            .video-facade .absolute.z-30 {
+                background-color: rgba(0,0,0,0.1);
+            }
+
+            /* Make the preview bar visible as a subtle line */
+            .preview-bar {
+                width: 100% !important;
+                opacity: 0.5;
+            }
+            
+            /* Disable the "Preview" text hover effect, just show it or hide it */
+            .group-hover\:opacity-0 {
+                opacity: 0 !important; /* Hide "Preview" text on mobile, play button is enough */
+            }
         }
 
         /* Video Facade Styling */
@@ -99,21 +150,10 @@
             z-index: 1;
         }
         
-        .video-facade:hover .thumbnail-img {
-            transform: scale(1.05);
-            opacity: 0.8;
-        }
-        
-        .video-facade:hover .play-btn {
-            transform: scale(1.1);
-            background-color: #d4af37;
-            color: black;
-            border-color: #d4af37;
-        }
-
         .play-btn {
             z-index: 40;
             position: relative;
+            transition: all 0.3s ease;
         }
         
         /* Fake Progress Bar */
@@ -128,11 +168,6 @@
             z-index: 40;
         }
 
-        .video-facade:hover .preview-bar {
-            width: 100%;
-        }
-
-        /* FIXED: Removed black background to prevent "solid black" issue while loading */
         .video-facade iframe {
             position: absolute;
             top: 0;
@@ -254,9 +289,11 @@
             <div class="flex flex-col md:flex-row justify-between items-end mb-12">
                 <div>
                     <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Selected Works</h2>
-                    <p class="text-gray-400 max-w-md">High-impact edits. Hover to preview.</p>
+                    <p class="text-gray-400 max-w-md hidden md:block">High-impact edits. Hover to preview.</p>
+                    <p class="text-gray-400 max-w-md block md:hidden">Swipe to explore edits.</p>
                 </div>
                 
+                <!-- Filters -->
                 <div id="portfolio-filters" class="flex gap-3 mt-6 md:mt-0 overflow-x-auto pb-2 no-scrollbar w-full md:w-auto">
                     <button class="tab-btn active px-6 py-2 rounded-full text-sm font-bold border border-white/10 transition-all whitespace-nowrap" data-filter="ugc-vsl">UGC & VSL</button>
                     <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="talking-heads">Talking Heads</button>
@@ -268,12 +305,20 @@
                 </div>
             </div>
 
-            <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 
+               MOBILE CAROUSEL / DESKTOP GRID IMPLEMENTATION
+               Classes changed: 
+               - Added 'flex' (for mobile row)
+               - Added 'md:grid' (to restore grid on desktop)
+               - Added 'overflow-x-auto snap-x snap-mandatory' (for carousel swipe)
+               - Added 'no-scrollbar' (hide messy scrollbars)
+            -->
+            <div id="portfolio-grid" class="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-8 md:pb-0 no-scrollbar scroll-pl-6">
                 
                 <!-- VSL Feature 1 -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <!-- Added: 'min-w-[85vw] md:min-w-0 snap-center' for carousel behavior -->
+                <div class="portfolio-item ugc-vsl min-w-[85vw] md:min-w-0 snap-center glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1CNkvI6jGOpPQLFkLz7UoSICCAc6XtCr9/preview">
-                        <!-- Loading Spinner added -->
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
                             <span class="text-xs tracking-widest uppercase text-white/50 group-hover:opacity-0 transition-opacity">Preview</span>
@@ -293,7 +338,7 @@
                 </div>
 
                 <!-- VSL Feature 2 -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item ugc-vsl min-w-[85vw] md:min-w-0 snap-center glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1baR5s6oN5x5fiX1pf-r4Fo9_eZ9vzmWR/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -311,7 +356,7 @@
                 </div>
 
                 <!-- VSL Feature 3 -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item ugc-vsl min-w-[85vw] md:min-w-0 snap-center glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1fJdQcPjq7pjXumi3p8ic-vNeWH-7oNp5/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -329,7 +374,7 @@
                 </div>
 
                 <!-- UGC Feature 1 -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item ugc-vsl min-w-[85vw] md:min-w-0 snap-center glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1rOVqPB5pyR0jz5_kGmxqTsSQZTHy9c8T/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -347,7 +392,7 @@
                 </div>
 
                 <!-- UGC Feature 2 -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item ugc-vsl min-w-[85vw] md:min-w-0 snap-center glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1ME0VsttVYuz707DBOIGoZHSqiNivATJD/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -365,7 +410,7 @@
                 </div>
 
                 <!-- UGC Feature 3 -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item ugc-vsl min-w-[85vw] md:min-w-0 snap-center glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1kDPVjIE311JGWLFayw6kZ8iDvBdWQOM7/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -383,7 +428,7 @@
                 </div>
 
                 <!-- Mentoring (Talking Heads) -->
-                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col">
+                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full h-[500px] video-facade" data-src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 bg-white/5 opacity-50 z-10 pointer-events-none">
@@ -405,7 +450,7 @@
                 </div>
 
                 <!-- 60 Second Interview -->
-                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col">
+                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full h-[500px] video-facade" data-src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview">
                          <div class="loader"></div>
                          <div class="absolute inset-0 bg-white/5 opacity-50 z-10 pointer-events-none">
@@ -426,7 +471,7 @@
                 </div>
 
                 <!-- Product Ad -->
-                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-[9/16] md:aspect-video video-facade" data-src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -443,7 +488,7 @@
                 </div>
 
                 <!-- Product Advertisement -->
-                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
+                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -461,7 +506,7 @@
                 </div>
 
                 <!-- PRC and CHED Visit -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -480,7 +525,7 @@
                 </div>
 
                 <!-- Typography Trailer -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -498,7 +543,7 @@
                 </div>
 
                 <!-- Pageant Teaser -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -515,7 +560,7 @@
                 </div>
 
                 <!-- SDE School Event -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -532,7 +577,7 @@
                 </div>
 
                 <!-- Orientation SDE -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -549,7 +594,7 @@
                 </div>
 
                 <!-- Automation Reel -->
-                <div class="portfolio-item ai-content hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
+                <div class="portfolio-item ai-content hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1t98x33a-Uv7AuFvYyvCzazxoIJK41L97/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -567,7 +612,7 @@
                 </div>
 
                 <!-- Gameplay -->
-                <div class="portfolio-item gameplay hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
+                <div class="portfolio-item gameplay hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1jqaQK6QCrZdSLrNtotXTasvmC3wwoOA-/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -585,7 +630,7 @@
                 </div>
 
                 <!-- Language Dub 1 -->
-                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/19nRZfuvxOezmaldEeP8ILRTVQHC-jEYF/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -603,7 +648,7 @@
                 </div>
 
                 <!-- Language Dub 2 -->
-                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
+                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col min-w-[85vw] md:min-w-0 snap-center">
                     <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1zYZ43nUH6XBxfIKAMmBrTZ3oq0ohLoSe/preview">
                         <div class="loader"></div>
                         <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
@@ -903,6 +948,8 @@
                     const filter = btn.getAttribute('data-filter');
 
                     portfolioItems.forEach(item => {
+                        // FIX: We need to maintain display: flex (for grid/row behavior) when unhiding
+                        // The 'hidden' class sets display:none. Removing it restores default display.
                         if (item.classList.contains(filter)) {
                             item.classList.remove('hidden');
                             item.classList.add('animate-fade-in');
