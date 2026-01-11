@@ -7,6 +7,8 @@
     <meta name="description" content="Portfolio of Ershad Elmaco. Specializing in high-retention VSLs, UGC, and viral short-form content.">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js for WebGL Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,16 +34,12 @@
                     animation: {
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 6s ease-in-out infinite',
+                        'spin-slow': 'spin 3s linear infinite',
                     },
                     keyframes: {
                         fadeIn: {
                             '0%': { opacity: '0', transform: 'translateY(10px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translate(-50%, -50%) scale(1)' },
-                            '50%': { transform: 'translate(-50%, -60%) scale(1.1)' },
                         }
                     }
                 }
@@ -49,13 +47,27 @@
         }
     </script>
     <style>
+        /* FIXED: Body background must be transparent for WebGL (z-index: -1) to show through */
         body {
-            background-color: #050505;
+            background-color: transparent; 
             color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* WebGL Container - Fixed background */
+        #webgl-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #050505; /* Fallback / Base color moved here */
         }
         
         .glass-panel {
-            background: rgba(18, 18, 18, 0.7);
+            background: rgba(18, 18, 18, 0.6);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -73,14 +85,23 @@
             position: relative;
             cursor: pointer;
             overflow: hidden;
-            /* Ensures iframe respects border radius */
             border-radius: 1rem 1rem 0 0; 
+            background: linear-gradient(45deg, #0f0f0f, #1a1a1a);
+        }
+
+        .video-facade::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 20px 20px;
+            opacity: 0.5;
+            z-index: 1;
         }
         
-        /* Micro-interaction: Hover State */
         .video-facade:hover .thumbnail-img {
             transform: scale(1.05);
-            opacity: 0.6;
+            opacity: 0.8;
         }
         
         .video-facade:hover .play-btn {
@@ -90,7 +111,12 @@
             border-color: #d4af37;
         }
 
-        /* Fake Progress Bar for Hover Preview Simulation */
+        .play-btn {
+            z-index: 40;
+            position: relative;
+        }
+        
+        /* Fake Progress Bar */
         .preview-bar {
             width: 0%;
             height: 4px;
@@ -106,6 +132,7 @@
             width: 100%;
         }
 
+        /* FIXED: Removed black background to prevent "solid black" issue while loading */
         .video-facade iframe {
             position: absolute;
             top: 0;
@@ -113,6 +140,7 @@
             width: 100%;
             height: 100%;
             z-index: 50;
+            border: none;
         }
 
         .tab-btn.active {
@@ -129,19 +157,32 @@
             scrollbar-width: none;
         }
 
-        .cinematic-grain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 50;
-            opacity: 0.05;
-            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%221%22/%3E%3C/svg%3E');
+        /* Loading Spinner for Videos */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: #d4af37;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -20px;
+            margin-left: -20px;
+            z-index: 45; /* Below iframe (50) but above background */
+            display: none; /* Hidden by default */
         }
 
-        /* Dynamic CTA Button Animation */
+        .video-facade.loading .loader {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .cta-pop-in {
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -153,7 +194,9 @@
     </style>
 </head>
 <body class="antialiased selection:bg-brand-gold selection:text-black">
-    <div class="cinematic-grain"></div>
+    
+    <!-- WebGL Canvas for "Broken Glass" Effect -->
+    <div id="webgl-bg"></div>
 
     <!-- Navigation -->
     <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md">
@@ -169,45 +212,45 @@
 
     <!-- Hero Section -->
     <header class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <!-- FIXED BACKGROUND ANIMATION: Increased opacity to 20% and added 'animate-float' -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-gold opacity-20 rounded-full blur-[120px] animate-float"></div>
         
-        <div class="container mx-auto px-6 relative z-10 text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse-slow">
-                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                <span class="text-xs uppercase tracking-widest text-gray-300">Available for 2026 Season</span>
-            </div>
-            
-            <h1 class="font-display text-6xl md:text-8xl font-bold leading-tight mb-6">
-                Turn Viewers Into <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-yellow-200">Obsessed Fans.</span>
-            </h1>
-            
-            <p class="font-sans text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-                Senior Editor & Visual Storyteller. Specializing in high-retention VSLs, 
-                viral short-form content, and cinematic commercial production.
-            </p>
-            
-            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <a href="#work" class="group relative px-8 py-4 bg-brand-gold text-black font-bold rounded-full overflow-hidden transition-transform hover:scale-105">
-                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    <span class="relative flex items-center gap-2">
-                        View Selected Works 
-                        <span class="material-symbols-outlined text-lg">arrow_downward</span>
-                    </span>
-                </a>
+        <div class="container mx-auto px-6 relative z-10 text-center pointer-events-none">
+            <div class="pointer-events-auto">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse-slow backdrop-blur-sm">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-xs uppercase tracking-widest text-gray-300">Available for 2026 Season</span>
+                </div>
                 
-                <button id="fb-archive-trigger" class="px-8 py-4 border border-white/10 rounded-full hover:bg-white/5 transition-colors flex items-center gap-2 text-gray-300">
-                    <span class="material-symbols-outlined text-brand-gold">folder_open</span>
-                    Access Archives
-                </button>
+                <h1 class="font-display text-6xl md:text-8xl font-bold leading-tight mb-6 drop-shadow-2xl">
+                    Turn Viewers Into <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-yellow-200">Obsessed Fans.</span>
+                </h1>
+                
+                <p class="font-sans text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow-md">
+                    Senior Editor & Visual Storyteller. Specializing in high-retention VSLs, 
+                    viral short-form content, and cinematic commercial production.
+                </p>
+                
+                <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                    <a href="#work" class="group relative px-8 py-4 bg-brand-gold text-black font-bold rounded-full overflow-hidden transition-transform hover:scale-105 shadow-lg shadow-brand-gold/20">
+                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        <span class="relative flex items-center gap-2">
+                            View Selected Works 
+                            <span class="material-symbols-outlined text-lg">arrow_downward</span>
+                        </span>
+                    </a>
+                    
+                    <button id="fb-archive-trigger" class="px-8 py-4 border border-white/10 rounded-full hover:bg-white/5 transition-colors flex items-center gap-2 text-gray-300 backdrop-blur-sm">
+                        <span class="material-symbols-outlined text-brand-gold">folder_open</span>
+                        Access Archives
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Main Portfolio Section -->
     <section id="work" class="py-24 relative min-h-screen">
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto px-6 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-end mb-12">
                 <div>
                     <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Selected Works</h2>
@@ -229,14 +272,13 @@
                 
                 <!-- VSL Feature 1 -->
                 <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1CNkvI6jGOpPQLFkLz7UoSICCAc6XtCr9/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">VSL</div>
-                        </div>
-                        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1CNkvI6jGOpPQLFkLz7UoSICCAc6XtCr9/preview">
+                        <!-- Loading Spinner added -->
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
                             <span class="text-xs tracking-widest uppercase text-white/50 group-hover:opacity-0 transition-opacity">Preview</span>
                         </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300 shadow-2xl">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -246,18 +288,15 @@
                     <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">VSL</span></div>
                         <h3 class="font-display text-xl font-bold">VSL Feature 1</h3>
-                        <!-- CTA Container moved inside padding area to prevent blocking video -->
                         <div class="cta-container"></div>
                     </div>
                 </div>
 
                 <!-- VSL Feature 2 -->
                 <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1baR5s6oN5x5fiX1pf-r4Fo9_eZ9vzmWR/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">VSL</div>
-                        </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1baR5s6oN5x5fiX1pf-r4Fo9_eZ9vzmWR/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -273,11 +312,9 @@
 
                 <!-- VSL Feature 3 -->
                 <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1fJdQcPjq7pjXumi3p8ic-vNeWH-7oNp5/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">VSL</div>
-                        </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1fJdQcPjq7pjXumi3p8ic-vNeWH-7oNp5/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -293,11 +330,9 @@
 
                 <!-- UGC Feature 1 -->
                 <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1rOVqPB5pyR0jz5_kGmxqTsSQZTHy9c8T/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">UGC</div>
-                        </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1rOVqPB5pyR0jz5_kGmxqTsSQZTHy9c8T/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -313,11 +348,9 @@
 
                 <!-- UGC Feature 2 -->
                 <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1ME0VsttVYuz707DBOIGoZHSqiNivATJD/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">UGC</div>
-                        </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1ME0VsttVYuz707DBOIGoZHSqiNivATJD/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -333,11 +366,9 @@
 
                 <!-- UGC Feature 3 -->
                 <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1kDPVjIE311JGWLFayw6kZ8iDvBdWQOM7/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">UGC</div>
-                        </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1kDPVjIE311JGWLFayw6kZ8iDvBdWQOM7/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -353,11 +384,12 @@
 
                 <!-- Mentoring (Talking Heads) -->
                 <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col">
-                    <div class="relative w-full h-[500px] video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-800 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20 rotate-90 md:rotate-0">9:16</div>
+                    <div class="relative w-full h-[500px] video-facade" data-src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 bg-white/5 opacity-50 z-10 pointer-events-none">
+                            <div class="w-full h-full flex items-center justify-center text-white/10 font-display font-bold text-4xl rotate-90 md:rotate-0">9:16</div>
                         </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -374,11 +406,12 @@
 
                 <!-- 60 Second Interview -->
                 <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col">
-                    <div class="relative w-full h-[500px] video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-800 transition-transform duration-700 ease-out z-10">
-                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20 rotate-90 md:rotate-0">9:16</div>
+                    <div class="relative w-full h-[500px] video-facade" data-src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview">
+                         <div class="loader"></div>
+                         <div class="absolute inset-0 bg-white/5 opacity-50 z-10 pointer-events-none">
+                            <div class="w-full h-full flex items-center justify-center text-white/10 font-display font-bold text-4xl rotate-90 md:rotate-0">9:16</div>
                         </div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -394,9 +427,9 @@
 
                 <!-- Product Ad -->
                 <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-[9/16] md:aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-[9/16] md:aspect-video video-facade" data-src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -411,9 +444,9 @@
 
                 <!-- Product Advertisement -->
                 <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -429,9 +462,9 @@
 
                 <!-- PRC and CHED Visit -->
                 <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -448,9 +481,9 @@
 
                 <!-- Typography Trailer -->
                 <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -466,9 +499,9 @@
 
                 <!-- Pageant Teaser -->
                 <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -483,9 +516,9 @@
 
                 <!-- SDE School Event -->
                 <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -500,9 +533,9 @@
 
                 <!-- Orientation SDE -->
                 <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -517,9 +550,9 @@
 
                 <!-- Automation Reel -->
                 <div class="portfolio-item ai-content hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1t98x33a-Uv7AuFvYyvCzazxoIJK41L97/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1t98x33a-Uv7AuFvYyvCzazxoIJK41L97/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -535,9 +568,9 @@
 
                 <!-- Gameplay -->
                 <div class="portfolio-item gameplay hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1jqaQK6QCrZdSLrNtotXTasvmC3wwoOA-/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1jqaQK6QCrZdSLrNtotXTasvmC3wwoOA-/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -553,9 +586,9 @@
 
                 <!-- Language Dub 1 -->
                 <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/19nRZfuvxOezmaldEeP8ILRTVQHC-jEYF/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/19nRZfuvxOezmaldEeP8ILRTVQHC-jEYF/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -571,9 +604,9 @@
 
                 <!-- Language Dub 2 -->
                 <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
-                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1zYZ43nUH6XBxfIKAMmBrTZ3oq0ohLoSe/preview">
-                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
-                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                    <div class="relative w-full aspect-video video-facade" data-src="https://drive.google.com/file/d/1zYZ43nUH6XBxfIKAMmBrTZ3oq0ohLoSe/preview">
+                        <div class="loader"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
@@ -593,7 +626,7 @@
 
     <!-- Services / Technical Stack (Updated: No After Effects) -->
     <section id="services" class="py-24 bg-brand-card relative">
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto px-6 relative z-10">
             <h2 class="font-display text-4xl font-bold mb-12 text-center">Engineering Visuals</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -722,7 +755,140 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. Filter Tabs Logic ---
+            // --- 1. Three.js Broken Glass Background ---
+            const initThreeJS = () => {
+                const container = document.getElementById('webgl-bg');
+                if (!container) return;
+
+                const scene = new THREE.Scene();
+                // Add subtle fog to blend distant shards
+                scene.fog = new THREE.FogExp2(0x050505, 0.05);
+
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // optimize for mobile
+                
+                // Important: Set clear color here since CSS body is transparent
+                renderer.setClearColor(0x050505, 1);
+                
+                container.appendChild(renderer.domElement);
+
+                // Lighting
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
+
+                const pointLight = new THREE.PointLight(0xd4af37, 2, 50); // Gold light
+                pointLight.position.set(5, 5, 5);
+                scene.add(pointLight);
+                
+                const blueLight = new THREE.PointLight(0x4287f5, 1, 50); // Cool contrast light
+                blueLight.position.set(-5, -5, 5);
+                scene.add(blueLight);
+
+                // Shards (Broken Glass)
+                const shards = [];
+                const shardGeometry = new THREE.IcosahedronGeometry(1, 0); // Low poly for sharp edges
+                
+                // Glass Material
+                const glassMaterial = new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    metalness: 0.1,
+                    roughness: 0.1,
+                    transmission: 0.9, // Glass-like transparency
+                    transparent: true,
+                    opacity: 0.8,
+                    side: THREE.DoubleSide
+                });
+
+                // Create random shards
+                for(let i=0; i<35; i++) {
+                    const mesh = new THREE.Mesh(shardGeometry, glassMaterial);
+                    
+                    // Random positions
+                    mesh.position.x = (Math.random() - 0.5) * 30;
+                    mesh.position.y = (Math.random() - 0.5) * 30;
+                    mesh.position.z = (Math.random() - 0.5) * 15 - 5; // Mostly behind
+                    
+                    // Random rotation
+                    mesh.rotation.x = Math.random() * Math.PI;
+                    mesh.rotation.y = Math.random() * Math.PI;
+                    
+                    // Random scale
+                    const scale = Math.random() * 0.8 + 0.2;
+                    mesh.scale.set(scale, scale, scale);
+
+                    // Custom properties for animation
+                    // REDUCED SPEEDS (Previously 0.005)
+                    mesh.userData = {
+                        rotSpeedX: (Math.random() - 0.5) * 0.002,
+                        rotSpeedY: (Math.random() - 0.5) * 0.002,
+                        floatSpeed: (Math.random() * 0.002) + 0.001,
+                        yOffset: Math.random() * Math.PI * 2
+                    };
+
+                    scene.add(mesh);
+                    shards.push(mesh);
+                }
+
+                camera.position.z = 10;
+
+                // Mouse interaction
+                let mouseX = 0;
+                let mouseY = 0;
+                let targetX = 0;
+                let targetY = 0;
+                const windowHalfX = window.innerWidth / 2;
+                const windowHalfY = window.innerHeight / 2;
+
+                document.addEventListener('mousemove', (event) => {
+                    mouseX = (event.clientX - windowHalfX) * 0.001;
+                    mouseY = (event.clientY - windowHalfY) * 0.001;
+                });
+
+                // Animation Loop
+                const clock = new THREE.Clock();
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+
+                    const elapsedTime = clock.getElapsedTime();
+
+                    // REDUCED SENSITIVITY (Previously multiplied by 2)
+                    targetX = mouseX * 0.1;
+                    targetY = mouseY * 0.1;
+
+                    // Smooth camera movement
+                    camera.rotation.x += 0.05 * (targetY - camera.rotation.x);
+                    camera.rotation.y += 0.05 * (targetX - camera.rotation.y);
+
+                    // Animate shards
+                    shards.forEach(shard => {
+                        shard.rotation.x += shard.userData.rotSpeedX;
+                        shard.rotation.y += shard.userData.rotSpeedY;
+                        
+                        // Floating effect
+                        shard.position.y += Math.sin(elapsedTime + shard.userData.yOffset) * shard.userData.floatSpeed;
+                    });
+
+                    renderer.render(scene, camera);
+                };
+
+                animate();
+
+                // Handle Resize
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            };
+
+            // Initialize WebGL
+            initThreeJS();
+
+            // --- 2. Filter Tabs Logic ---
             const tabButtons = document.querySelectorAll('.tab-btn');
             const portfolioItems = document.querySelectorAll('.portfolio-item');
 
@@ -748,33 +914,42 @@
                 });
             });
 
-            // --- 2. Video Facade & Direct CTA Logic (UPDATED FOR DRIVE) ---
+            // --- 3. Video Facade & Direct CTA Logic ---
             const facades = document.querySelectorAll('.video-facade');
             
             facades.forEach(facade => {
                 facade.addEventListener('click', function() {
                     const src = this.getAttribute('data-src');
                     
+                    // Show Loading State
+                    this.classList.add('loading');
+                    
                     // Create iframe
                     const iframe = document.createElement('iframe');
                     
-                    // FIX: Check if it's a Google Drive link
-                    // Google Drive Previews DO NOT support the 'autoplay' parameter correctly in iframes
-                    // Adding random parameters to drive links can sometimes break the player or cause loop issues
+                    // Logic for Drive vs Others
                     if (src.includes('drive.google.com')) {
-                        // For Drive, use the raw preview URL
                         iframe.setAttribute('src', src);
                     } else {
-                        // For YouTube/Vimeo/Others, we can try to autoplay
                         iframe.setAttribute('src', src + (src.includes('?') ? '&' : '?') + 'autoplay=1&mute=1');
                     }
                     
                     iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
                     iframe.setAttribute('allowfullscreen', '');
+                    // Removed background color black from iframe via inline style just in case
+                    iframe.style.background = 'transparent'; 
                     iframe.classList.add('absolute', 'inset-0', 'w-full', 'h-full', 'z-50');
                     
-                    // Clear inner content (images/buttons) and append iframe
+                    // Handle Load Event to remove spinner
+                    iframe.onload = () => {
+                        this.classList.remove('loading');
+                    };
+
+                    // Clear inner content and append iframe
+                    // Keep loader but remove buttons/overlays
+                    const loader = this.querySelector('.loader');
                     this.innerHTML = ''; 
+                    if(loader) this.appendChild(loader);
                     this.appendChild(iframe);
 
                     // --- DIRECT CTA INTEGRATION ---
@@ -795,7 +970,7 @@
                 });
             });
 
-            // --- 3. Modal Logic ---
+            // --- 4. Modal Logic ---
             const modal = document.getElementById('archive-modal');
             const openBtn = document.getElementById('fb-archive-trigger');
             const closeBtn = document.getElementById('close-modal');
@@ -821,7 +996,7 @@
                 if (e.target === modal) toggleModal(false);
             });
 
-            // --- 4. Entrance Animations ---
+            // --- 5. Entrance Animations ---
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: "0px 0px -50px 0px"
