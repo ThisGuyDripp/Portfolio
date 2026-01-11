@@ -32,11 +32,16 @@
                     animation: {
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
                     },
                     keyframes: {
                         fadeIn: {
                             '0%': { opacity: '0', transform: 'translateY(10px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translate(-50%, -50%) scale(1)' },
+                            '50%': { transform: 'translate(-50%, -60%) scale(1.1)' },
                         }
                     }
                 }
@@ -132,7 +137,8 @@
             height: 100%;
             pointer-events: none;
             z-index: 50;
-            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.04%22/%3E%3C/svg%3E');
+            opacity: 0.05;
+            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%221%22/%3E%3C/svg%3E');
         }
 
         /* Dynamic CTA Button Animation */
@@ -163,7 +169,8 @@
 
     <!-- Hero Section -->
     <header class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-gold opacity-5 rounded-full blur-[120px]"></div>
+        <!-- FIXED BACKGROUND ANIMATION: Increased opacity to 20% and added 'animate-float' -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-gold opacity-20 rounded-full blur-[120px] animate-float"></div>
         
         <div class="container mx-auto px-6 relative z-10 text-center">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse-slow">
@@ -741,42 +748,47 @@
                 });
             });
 
-            // --- 2. Video Facade & Direct CTA Logic ---
+            // --- 2. Video Facade & Direct CTA Logic (UPDATED FOR DRIVE) ---
             const facades = document.querySelectorAll('.video-facade');
             
             facades.forEach(facade => {
                 facade.addEventListener('click', function() {
                     const src = this.getAttribute('data-src');
+                    
                     // Create iframe
                     const iframe = document.createElement('iframe');
-                    // Attempting to autoplay (Best effort for Drive, works for YT/Vimeo)
-                    iframe.setAttribute('src', src + (src.includes('?') ? '&' : '?') + 'autoplay=1&mute=1');
-                    iframe.setAttribute('allow', 'autoplay; encrypted-media');
+                    
+                    // FIX: Check if it's a Google Drive link
+                    // Google Drive Previews DO NOT support the 'autoplay' parameter correctly in iframes
+                    // Adding random parameters to drive links can sometimes break the player or cause loop issues
+                    if (src.includes('drive.google.com')) {
+                        // For Drive, use the raw preview URL
+                        iframe.setAttribute('src', src);
+                    } else {
+                        // For YouTube/Vimeo/Others, we can try to autoplay
+                        iframe.setAttribute('src', src + (src.includes('?') ? '&' : '?') + 'autoplay=1&mute=1');
+                    }
+                    
+                    iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
                     iframe.setAttribute('allowfullscreen', '');
                     iframe.classList.add('absolute', 'inset-0', 'w-full', 'h-full', 'z-50');
                     
-                    // Clear inner content and append iframe
+                    // Clear inner content (images/buttons) and append iframe
                     this.innerHTML = ''; 
                     this.appendChild(iframe);
 
-                    // --- DIRECT CTA INTEGRATION (MOVED TO PADDING AREA) ---
-                    // Locate the .cta-container inside the current portfolio item's padding area
-                    // We go up to the parent .portfolio-item, then find .cta-container inside it
+                    // --- DIRECT CTA INTEGRATION ---
                     const portfolioItem = this.closest('.portfolio-item');
                     const ctaContainer = portfolioItem.querySelector('.cta-container');
 
                     if (ctaContainer) {
-                        // Create the button dynamically
                         const btn = document.createElement('a');
-                        btn.href = '#contact'; // Anchor to contact section
-                        // Button styles: Block display, top margin, visible background
+                        btn.href = '#contact';
                         btn.className = 'block w-full mt-4 py-3 bg-brand-gold text-black font-bold text-center rounded-lg hover:bg-white transition-all transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2 cta-pop-in border border-transparent';
                         btn.innerHTML = `
                             <span>Book a video like this</span>
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         `;
-                        
-                        // Clear previous content just in case and append
                         ctaContainer.innerHTML = '';
                         ctaContainer.appendChild(btn);
                     }
