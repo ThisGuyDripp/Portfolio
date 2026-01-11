@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <script>
         tailwind.config = {
             theme: {
@@ -31,6 +31,7 @@
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         fadeIn: {
@@ -53,12 +54,13 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .glass-panel:hover {
             border-color: rgba(212, 175, 55, 0.3);
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px);
         }
 
         /* Video Facade Styling */
@@ -66,6 +68,14 @@
             position: relative;
             cursor: pointer;
             overflow: hidden;
+            /* Ensures iframe respects border radius */
+            border-radius: 1rem 1rem 0 0; 
+        }
+        
+        /* Micro-interaction: Hover State */
+        .video-facade:hover .thumbnail-img {
+            transform: scale(1.05);
+            opacity: 0.6;
         }
         
         .video-facade:hover .play-btn {
@@ -75,12 +85,29 @@
             border-color: #d4af37;
         }
 
+        /* Fake Progress Bar for Hover Preview Simulation */
+        .preview-bar {
+            width: 0%;
+            height: 4px;
+            background: #d4af37;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transition: width 3s linear;
+            z-index: 40;
+        }
+
+        .video-facade:hover .preview-bar {
+            width: 100%;
+        }
+
         .video-facade iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 50;
         }
 
         .tab-btn.active {
@@ -89,7 +116,6 @@
             border-color: #d4af37;
         }
 
-        /* Hide Scrollbar for tabs */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -98,7 +124,6 @@
             scrollbar-width: none;
         }
 
-        /* Cinematic Grain Overlay */
         .cinematic-grain {
             position: fixed;
             top: 0;
@@ -109,10 +134,19 @@
             z-index: 50;
             background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.04%22/%3E%3C/svg%3E');
         }
+
+        /* Dynamic CTA Button Animation */
+        .cta-pop-in {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-brand-gold selection:text-black">
-    <!-- Cinematic Grain Overlay -->
     <div class="cinematic-grain"></div>
 
     <!-- Navigation -->
@@ -129,11 +163,10 @@
 
     <!-- Hero Section -->
     <header class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <!-- Abstract Background Glow -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-gold opacity-5 rounded-full blur-[120px]"></div>
         
         <div class="container mx-auto px-6 relative z-10 text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse-slow">
                 <span class="w-2 h-2 rounded-full bg-green-500"></span>
                 <span class="text-xs uppercase tracking-widest text-gray-300">Available for 2026 Season</span>
             </div>
@@ -171,415 +204,442 @@
             <div class="flex flex-col md:flex-row justify-between items-end mb-12">
                 <div>
                     <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Selected Works</h2>
-                    <p class="text-gray-400 max-w-md">A curation of high-impact edits designed for retention.</p>
+                    <p class="text-gray-400 max-w-md">High-impact edits. Hover to preview.</p>
                 </div>
                 
-                <!-- Functional Filter Tabs -->
                 <div id="portfolio-filters" class="flex gap-3 mt-6 md:mt-0 overflow-x-auto pb-2 no-scrollbar w-full md:w-auto">
-                    <button class="tab-btn active px-6 py-2 rounded-full text-sm font-bold border border-white/10 transition-all whitespace-nowrap" data-filter="ugc-vsl">
-                        UGC & VSL
-                    </button>
-                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="talking-heads">
-                        Talking Heads
-                    </button>
-                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="commercial">
-                        Commercial
-                    </button>
-                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="events">
-                        Events
-                    </button>
-                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="ai-content">
-                        A.I. Generated Content
-                    </button>
-                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="gameplay">
-                        Gameplay
-                    </button>
-                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="dubbing">
-                        Dubbing & Localization
-                    </button>
+                    <button class="tab-btn active px-6 py-2 rounded-full text-sm font-bold border border-white/10 transition-all whitespace-nowrap" data-filter="ugc-vsl">UGC & VSL</button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="talking-heads">Talking Heads</button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="commercial">Commercial</button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="events">Events</button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="ai-content">A.I. Content</button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="gameplay">Gameplay</button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="dubbing">Dubbing</button>
                 </div>
             </div>
 
-            <!-- Portfolio Grid -->
             <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                <!-- === TAB 1: UGC & VSL === -->
-                
-                <!-- VSL Feature 1 (Originally UGC 1) -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                <!-- VSL Feature 1 -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1CNkvI6jGOpPQLFkLz7UoSICCAc6XtCr9/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
-                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">VSL</div>
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                            <span class="text-xs tracking-widest uppercase text-white/50 group-hover:opacity-0 transition-opacity">Preview</span>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300 shadow-2xl">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">VSL</span></div>
                         <h3 class="font-display text-xl font-bold">VSL Feature 1</h3>
+                        <!-- CTA Container moved inside padding area to prevent blocking video -->
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- VSL Feature 2 (New) -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                <!-- VSL Feature 2 -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1baR5s6oN5x5fiX1pf-r4Fo9_eZ9vzmWR/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">VSL</div>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">VSL</span></div>
                         <h3 class="font-display text-xl font-bold">VSL Feature 2</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- VSL Feature 3 (New) -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                <!-- VSL Feature 3 -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1fJdQcPjq7pjXumi3p8ic-vNeWH-7oNp5/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">VSL</div>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">VSL</span></div>
                         <h3 class="font-display text-xl font-bold">VSL Feature 3</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- UGC Feature 1 (Originally UGC 2) -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                <!-- UGC Feature 1 -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1rOVqPB5pyR0jz5_kGmxqTsSQZTHy9c8T/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">UGC</div>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">UGC</span></div>
                         <h3 class="font-display text-xl font-bold">UGC Feature 1</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- UGC Feature 2 (New) -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                <!-- UGC Feature 2 -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1ME0VsttVYuz707DBOIGoZHSqiNivATJD/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">UGC</div>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">UGC</span></div>
                         <h3 class="font-display text-xl font-bold">UGC Feature 2</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- UGC Feature 3 (New) -->
-                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                <!-- UGC Feature 3 -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1kDPVjIE311JGWLFayw6kZ8iDvBdWQOM7/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20">UGC</div>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">UGC</span></div>
                         <h3 class="font-display text-xl font-bold">UGC Feature 3</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-
-                <!-- === TAB 2: TALKING HEADS === -->
-                <!-- Mentoring -->
-                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2">
+                <!-- Mentoring (Talking Heads) -->
+                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col">
                     <div class="relative w-full h-[500px] video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-800 z-10"><span class="text-gray-500 text-xs tracking-widest uppercase rotate-90 md:rotate-0">9:16 Vertical</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-800 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20 rotate-90 md:rotate-0">9:16</div>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-purple-500 text-white rounded-sm">Shorts</span></div>
                         <h3 class="font-display text-xl font-bold">Mentoring</h3>
                         <p class="text-sm text-gray-400 mt-2">Retention focused editing.</p>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
                 <!-- 60 Second Interview -->
-                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2">
+                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2 flex flex-col">
                     <div class="relative w-full h-[500px] video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-800 z-10"><span class="text-gray-500 text-xs tracking-widest uppercase rotate-90 md:rotate-0">9:16 Vertical</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-800 transition-transform duration-700 ease-out z-10">
+                            <div class="w-full h-full flex items-center justify-center text-gray-700 font-display font-bold text-4xl opacity-20 rotate-90 md:rotate-0">9:16</div>
+                        </div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-purple-500 text-white rounded-sm">Reels</span></div>
                         <h3 class="font-display text-xl font-bold">60 Second Interview</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- === TAB 3: COMMERCIAL === -->
-                <!-- Product Ad (Vertical from "Shorts/Vertical" section in original) -->
-                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group">
+                <!-- Product Ad -->
+                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-[9/16] md:aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Ad Spot</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">Product Ad</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- Product Advertisement (Horizontal) -->
-                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                <!-- Product Advertisement -->
+                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Commercial</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">Product Advertisement</h3>
                         <p class="text-sm text-gray-400 mt-1">Full brand commercial production.</p>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- === TAB 4: EVENTS === -->
-                <!-- PRC and CHED Visit (Priority) -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                <!-- PRC and CHED Visit -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Official Coverage</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-green-600 text-white rounded-sm">Academic</span></div>
                         <h3 class="font-display text-xl font-bold">PRC and CHED Visit</h3>
                         <p class="text-sm text-gray-400 mt-1">Promotional Video of BS Geology Program at NORSU.</p>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- Typography Trailer (Moved to Events) -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                <!-- Typography Trailer -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Motion Graphics</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-blue-500 text-white rounded-sm">Typography</span></div>
                         <h3 class="font-display text-xl font-bold">Typography Trailer</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- Pageant Teaser (Moved to Events) -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                <!-- Pageant Teaser -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Teaser</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">Pageant Teaser</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
                 <!-- SDE School Event -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">SDE</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">School Event SDE</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
                 <!-- Orientation SDE -->
-                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">SDE</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">Orientation SDE</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- === TAB 5: A.I. GENERATED CONTENT === -->
-                <div class="portfolio-item ai-content hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                <!-- Automation Reel -->
+                <div class="portfolio-item ai-content hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1t98x33a-Uv7AuFvYyvCzazxoIJK41L97/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Automation</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-red-600 text-white rounded-sm">YouTube</span></div>
                         <h3 class="font-display text-xl font-bold">Automation Reel</h3>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- === TAB 6: GAMEPLAY === -->
-                <div class="portfolio-item gameplay hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                <!-- Gameplay -->
+                <div class="portfolio-item gameplay hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2 flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1jqaQK6QCrZdSLrNtotXTasvmC3wwoOA-/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Gaming</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">Gameplay Highlight</h3>
                         <p class="text-sm text-gray-400 mt-1">Dynamic cuts & SFX.</p>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
-                <!-- === TAB 7: DUBBING & LOCALIZATION === -->
                 <!-- Language Dub 1 -->
-                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group">
+                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/19nRZfuvxOezmaldEeP8ILRTVQHC-jEYF/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">Language Dub 1</h3>
                         <p class="text-sm text-gray-400 mt-1">Audio Synchronization.</p>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
 
                 <!-- Language Dub 2 -->
-                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group">
+                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group flex flex-col">
                     <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1zYZ43nUH6XBxfIKAMmBrTZ3oq0ohLoSe/preview">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
-                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                        <div class="thumbnail-img absolute inset-0 bg-gray-900 transition-transform duration-700 ease-out z-10"></div>
+                        <div class="absolute inset-0 z-30 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                             <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
                                 <span class="material-symbols-outlined text-3xl">play_arrow</span>
                             </button>
                         </div>
+                        <div class="preview-bar"></div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-6 mt-auto">
                         <h3 class="font-display text-xl font-bold">Language Dub 2</h3>
                         <p class="text-sm text-gray-400 mt-1">Localization.</p>
+                        <div class="cta-container"></div>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Services / Technical Stack (Color Grading Removed) -->
+    <!-- Services / Technical Stack (Updated: No After Effects) -->
     <section id="services" class="py-24 bg-brand-card relative">
         <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div>
-                    <h2 class="font-display text-4xl font-bold mb-6">Technical Arsenal</h2>
-                    <p class="text-gray-400 text-lg mb-8">
-                        I don't just cut clips. I engineer visual experiences using industry-standard tools and modern retention psychology.
-                    </p>
-                    
-                    <div class="space-y-6">
-                        <!-- Skill Bar -->
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="font-bold">Premiere Pro (Advanced)</span>
-                                <span class="text-brand-gold">95%</span>
-                            </div>
-                            <div class="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-brand-gold w-[95%]"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Skill Bar -->
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="font-bold">Sound Design (Audition)</span>
-                                <span class="text-brand-gold">85%</span>
-                            </div>
-                            <div class="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-brand-gold w-[85%]"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Skill Bar -->
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="font-bold">CapCut (Short Form)</span>
-                                <span class="text-brand-gold">100%</span>
-                            </div>
-                            <div class="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-brand-gold w-[100%]"></div>
-                            </div>
-                        </div>
+            <h2 class="font-display text-4xl font-bold mb-12 text-center">Engineering Visuals</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Tech Stack Card 1 -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">cut</span>
+                        <h3 class="font-bold text-lg">Premiere Pro</h3>
                     </div>
+                    <p class="text-sm text-gray-500">Industry-standard non-linear editing for complex workflows.</p>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20">
-                        <span class="material-symbols-outlined text-4xl text-brand-gold mb-4">movie_edit</span>
-                        <h3 class="font-bold text-lg mb-2">Video Editing</h3>
-                        <p class="text-sm text-gray-500">Pacing, narrative flow, and engaging cuts.</p>
+                <!-- Tech Stack Card 3 -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">graphic_eq</span>
+                        <h3 class="font-bold text-lg">Adobe Audition</h3>
                     </div>
-                    
-                    <!-- Color Grading Removed -->
-                    <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20">
-                        <span class="material-symbols-outlined text-4xl text-brand-gold mb-4">equalizer</span>
-                        <h3 class="font-bold text-lg mb-2">Sound Design</h3>
-                        <p class="text-sm text-gray-500">Immersive audio mixing and SFX.</p>
+                    <p class="text-sm text-gray-500">Spectral cleaning, noise reduction, and sound mixing.</p>
+                </div>
+                
+                <!-- Tech Stack Card 4 -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">speed</span>
+                        <h3 class="font-bold text-lg">CapCut Desktop</h3>
                     </div>
-                    
-                    <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 col-span-2">
-                        <span class="material-symbols-outlined text-4xl text-brand-gold mb-4">bolt</span>
-                        <h3 class="font-bold text-lg mb-2">Viral Reels</h3>
-                        <p class="text-sm text-gray-500">Optimized for TikTok & IG algorithm.</p>
-                    </div>
+                    <p class="text-sm text-gray-500">Rapid deployment for algorithmic short-form content.</p>
+                </div>
+
+                <!-- Capability Card 1 -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-white/10 hover:bg-white/5 transition-all group md:col-span-3 lg:col-span-1">
+                    <h3 class="font-bold text-lg mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-brand-gold">psychology</span>
+                        Retention Engineering
+                    </h3>
+                    <ul class="text-sm text-gray-400 space-y-2 mt-3">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-gold rounded-full"></span>Pattern Interrupts</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-gold rounded-full"></span>Visual Pacing based on dopamine spikes</li>
+                    </ul>
+                </div>
+                
+                <!-- Capability Card 2 -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-white/10 hover:bg-white/5 transition-all group md:col-span-3 lg:col-span-2">
+                    <h3 class="font-bold text-lg mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-brand-gold">trending_up</span>
+                        Viral Optimization
+                    </h3>
+                    <ul class="text-sm text-gray-400 space-y-2 mt-3">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-gold rounded-full"></span>Hook Testing & Variation</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-gold rounded-full"></span>Platform-native Typography</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-gold rounded-full"></span>Safe Zone Formatting (IG/TikTok/Shorts)</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -595,9 +655,9 @@
                 Stop losing viewers to boring edits. Let's create content that demands attention.
             </p>
             
-            <a href="mailto:tatad5289@gmail.com" class="inline-flex items-center gap-3 px-10 py-5 bg-white text-black font-bold rounded-full text-lg hover:bg-brand-gold transition-colors shadow-xl shadow-white/5">
+            <a href="mailto:chipotletatad@gmail.com" class="inline-flex items-center gap-3 px-10 py-5 bg-white text-black font-bold rounded-full text-lg hover:bg-brand-gold transition-colors shadow-xl shadow-white/5">
                 <span class="material-symbols-outlined">mail</span>
-                tatad5289@gmail.com
+                chipotletatad@gmail.com
             </a>
             
             <div class="mt-16 flex justify-center gap-8">
@@ -661,17 +721,14 @@
 
             tabButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    // Remove active class from all buttons
                     tabButtons.forEach(b => b.classList.remove('active', 'text-black', 'bg-brand-gold'));
                     tabButtons.forEach(b => b.classList.add('text-gray-400'));
                     
-                    // Add active class to clicked button
                     btn.classList.add('active');
                     btn.classList.remove('text-gray-400');
                     
                     const filter = btn.getAttribute('data-filter');
 
-                    // Filter Items with Animation
                     portfolioItems.forEach(item => {
                         if (item.classList.contains(filter)) {
                             item.classList.remove('hidden');
@@ -684,7 +741,7 @@
                 });
             });
 
-            // --- 2. Video Facade Logic ---
+            // --- 2. Video Facade & Direct CTA Logic ---
             const facades = document.querySelectorAll('.video-facade');
             
             facades.forEach(facade => {
@@ -692,14 +749,37 @@
                     const src = this.getAttribute('data-src');
                     // Create iframe
                     const iframe = document.createElement('iframe');
-                    iframe.setAttribute('src', src);
+                    // Attempting to autoplay (Best effort for Drive, works for YT/Vimeo)
+                    iframe.setAttribute('src', src + (src.includes('?') ? '&' : '?') + 'autoplay=1&mute=1');
                     iframe.setAttribute('allow', 'autoplay; encrypted-media');
                     iframe.setAttribute('allowfullscreen', '');
-                    iframe.classList.add('absolute', 'inset-0', 'w-full', 'h-full', 'z-30');
+                    iframe.classList.add('absolute', 'inset-0', 'w-full', 'h-full', 'z-50');
                     
                     // Clear inner content and append iframe
                     this.innerHTML = ''; 
                     this.appendChild(iframe);
+
+                    // --- DIRECT CTA INTEGRATION (MOVED TO PADDING AREA) ---
+                    // Locate the .cta-container inside the current portfolio item's padding area
+                    // We go up to the parent .portfolio-item, then find .cta-container inside it
+                    const portfolioItem = this.closest('.portfolio-item');
+                    const ctaContainer = portfolioItem.querySelector('.cta-container');
+
+                    if (ctaContainer) {
+                        // Create the button dynamically
+                        const btn = document.createElement('a');
+                        btn.href = '#contact'; // Anchor to contact section
+                        // Button styles: Block display, top margin, visible background
+                        btn.className = 'block w-full mt-4 py-3 bg-brand-gold text-black font-bold text-center rounded-lg hover:bg-white transition-all transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2 cta-pop-in border border-transparent';
+                        btn.innerHTML = `
+                            <span>Book a video like this</span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        `;
+                        
+                        // Clear previous content just in case and append
+                        ctaContainer.innerHTML = '';
+                        ctaContainer.appendChild(btn);
+                    }
                 });
             });
 
