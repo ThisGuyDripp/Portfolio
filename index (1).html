@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ershad Elmaco | High-Retention Video Editor</title>
+    <meta name="description" content="Portfolio of Ershad Elmaco. Specializing in high-retention VSLs, UGC, and viral short-form content.">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#d4af37',
+                            dark: '#050505',
+                            card: '#121212',
+                            gray: '#1f1f1f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+        }
+        
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Video Facade Styling */
+        .video-facade {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .video-facade:hover .play-btn {
+            transform: scale(1.1);
+            background-color: #d4af37;
+            color: black;
+            border-color: #d4af37;
+        }
+
+        .video-facade iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .tab-btn.active {
+            background-color: #d4af37;
+            color: black;
+            border-color: #d4af37;
+        }
+
+        /* Hide Scrollbar for tabs */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Cinematic Grain Overlay */
+        .cinematic-grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.04%22/%3E%3C/svg%3E');
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-gold selection:text-black">
+    <!-- Cinematic Grain Overlay -->
+    <div class="cinematic-grain"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md">
+        <div class="glass-panel rounded-full px-6 py-3 flex justify-between items-center shadow-2xl shadow-brand-gold/10">
+            <a href="#" class="font-display font-bold text-lg tracking-tight text-white">ERSHAD<span class="text-brand-gold">.</span></a>
+            <div class="flex gap-6 text-sm font-medium text-gray-400">
+                <a href="#work" class="hover:text-white transition-colors">Work</a>
+                <a href="#services" class="hover:text-white transition-colors">Services</a>
+                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <!-- Abstract Background Glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-gold opacity-5 rounded-full blur-[120px]"></div>
+        
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-xs uppercase tracking-widest text-gray-300">Available for 2026 Season</span>
+            </div>
+            
+            <h1 class="font-display text-6xl md:text-8xl font-bold leading-tight mb-6">
+                Turn Viewers Into <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-yellow-200">Obsessed Fans.</span>
+            </h1>
+            
+            <p class="font-sans text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                Senior Editor & Visual Storyteller. Specializing in high-retention VSLs, 
+                viral short-form content, and cinematic commercial production.
+            </p>
+            
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                <a href="#work" class="group relative px-8 py-4 bg-brand-gold text-black font-bold rounded-full overflow-hidden transition-transform hover:scale-105">
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <span class="relative flex items-center gap-2">
+                        View Selected Works 
+                        <span class="material-symbols-outlined text-lg">arrow_downward</span>
+                    </span>
+                </a>
+                
+                <button id="fb-archive-trigger" class="px-8 py-4 border border-white/10 rounded-full hover:bg-white/5 transition-colors flex items-center gap-2 text-gray-300">
+                    <span class="material-symbols-outlined text-brand-gold">folder_open</span>
+                    Access Archives
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Portfolio Section -->
+    <section id="work" class="py-24 relative min-h-screen">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Selected Works</h2>
+                    <p class="text-gray-400 max-w-md">A curation of high-impact edits designed for retention.</p>
+                </div>
+                
+                <!-- Functional Filter Tabs -->
+                <div id="portfolio-filters" class="flex gap-3 mt-6 md:mt-0 overflow-x-auto pb-2 no-scrollbar w-full md:w-auto">
+                    <button class="tab-btn active px-6 py-2 rounded-full text-sm font-bold border border-white/10 transition-all whitespace-nowrap" data-filter="ugc-vsl">
+                        UGC & VSL
+                    </button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="talking-heads">
+                        Talking Heads
+                    </button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="commercial">
+                        Commercial
+                    </button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="events">
+                        Events
+                    </button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="ai-content">
+                        A.I. Generated Content
+                    </button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="gameplay">
+                        Gameplay
+                    </button>
+                    <button class="tab-btn px-6 py-2 rounded-full text-sm font-bold border border-white/10 text-gray-400 hover:text-white transition-all whitespace-nowrap" data-filter="dubbing">
+                        Dubbing & Localization
+                    </button>
+                </div>
+            </div>
+
+            <!-- Portfolio Grid -->
+            <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- === TAB 1: UGC & VSL === -->
+                
+                <!-- VSL Feature 1 (Originally UGC 1) -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1CNkvI6jGOpPQLFkLz7UoSICCAc6XtCr9/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">VSL</span></div>
+                        <h3 class="font-display text-xl font-bold">VSL Feature 1</h3>
+                    </div>
+                </div>
+
+                <!-- VSL Feature 2 (New) -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1baR5s6oN5x5fiX1pf-r4Fo9_eZ9vzmWR/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">VSL</span></div>
+                        <h3 class="font-display text-xl font-bold">VSL Feature 2</h3>
+                    </div>
+                </div>
+
+                <!-- VSL Feature 3 (New) -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1fJdQcPjq7pjXumi3p8ic-vNeWH-7oNp5/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">VSL</span></div>
+                        <h3 class="font-display text-xl font-bold">VSL Feature 3</h3>
+                    </div>
+                </div>
+
+                <!-- UGC Feature 1 (Originally UGC 2) -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1rOVqPB5pyR0jz5_kGmxqTsSQZTHy9c8T/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">UGC</span></div>
+                        <h3 class="font-display text-xl font-bold">UGC Feature 1</h3>
+                    </div>
+                </div>
+
+                <!-- UGC Feature 2 (New) -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1ME0VsttVYuz707DBOIGoZHSqiNivATJD/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">UGC</span></div>
+                        <h3 class="font-display text-xl font-bold">UGC Feature 2</h3>
+                    </div>
+                </div>
+
+                <!-- UGC Feature 3 (New) -->
+                <div class="portfolio-item ugc-vsl glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1kDPVjIE311JGWLFayw6kZ8iDvBdWQOM7/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-brand-gold text-black rounded-sm">UGC</span></div>
+                        <h3 class="font-display text-xl font-bold">UGC Feature 3</h3>
+                    </div>
+                </div>
+
+
+                <!-- === TAB 2: TALKING HEADS === -->
+                <!-- Mentoring -->
+                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2">
+                    <div class="relative w-full h-[500px] video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1dYgVw1eGY-SzZCnPffbmtlMOjtesxXH3/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-800 z-10"><span class="text-gray-500 text-xs tracking-widest uppercase rotate-90 md:rotate-0">9:16 Vertical</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-purple-500 text-white rounded-sm">Shorts</span></div>
+                        <h3 class="font-display text-xl font-bold">Mentoring</h3>
+                        <p class="text-sm text-gray-400 mt-2">Retention focused editing.</p>
+                    </div>
+                </div>
+
+                <!-- 60 Second Interview -->
+                <div class="portfolio-item talking-heads hidden glass-panel rounded-2xl overflow-hidden group row-span-2">
+                    <div class="relative w-full h-[500px] video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1NjOB24VP3bcKnk2MS3aRYRVbIlOnD5Bj/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-800 z-10"><span class="text-gray-500 text-xs tracking-widest uppercase rotate-90 md:rotate-0">9:16 Vertical</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-purple-500 text-white rounded-sm">Reels</span></div>
+                        <h3 class="font-display text-xl font-bold">60 Second Interview</h3>
+                    </div>
+                </div>
+
+                <!-- === TAB 3: COMMERCIAL === -->
+                <!-- Product Ad (Vertical from "Shorts/Vertical" section in original) -->
+                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-[9/16] md:aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1FV_wstzVhQQ0ZPH9gK_AnV1SoZH8o_kv/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Ad Spot</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">Product Ad</h3>
+                    </div>
+                </div>
+
+                <!-- Product Advertisement (Horizontal) -->
+                <div class="portfolio-item commercial hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1o7IR8PpV7vGr3jl9DZJDmkIgnM5Eee6o/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Commercial</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">Product Advertisement</h3>
+                        <p class="text-sm text-gray-400 mt-1">Full brand commercial production.</p>
+                    </div>
+                </div>
+
+                <!-- === TAB 4: EVENTS === -->
+                <!-- PRC and CHED Visit (Priority) -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1-t2dE4AnEcTDd4dRkQ28KwTAoyFklNLg/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Official Coverage</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-green-600 text-white rounded-sm">Academic</span></div>
+                        <h3 class="font-display text-xl font-bold">PRC and CHED Visit</h3>
+                        <p class="text-sm text-gray-400 mt-1">Promotional Video of BS Geology Program at NORSU.</p>
+                    </div>
+                </div>
+
+                <!-- Typography Trailer (Moved to Events) -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1opEukoCVmRbodUFOyoT_noxbkXZNXbvI/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Motion Graphics</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-blue-500 text-white rounded-sm">Typography</span></div>
+                        <h3 class="font-display text-xl font-bold">Typography Trailer</h3>
+                    </div>
+                </div>
+
+                <!-- Pageant Teaser (Moved to Events) -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1Z_bjg70Lo3fUGsGICjWm1ug1sY5nhfMY/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Teaser</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">Pageant Teaser</h3>
+                    </div>
+                </div>
+
+                <!-- SDE School Event -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1hgMbYhsn4KNPnxw5Zk6Pvt_Ps5_n_T0u/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">SDE</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">School Event SDE</h3>
+                    </div>
+                </div>
+
+                <!-- Orientation SDE -->
+                <div class="portfolio-item events hidden glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1r_gihQkvI85SgwYUcL1uC5petUMp0LFB/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">SDE</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">Orientation SDE</h3>
+                    </div>
+                </div>
+
+                <!-- === TAB 5: A.I. GENERATED CONTENT === -->
+                <div class="portfolio-item ai-content hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1t98x33a-Uv7AuFvYyvCzazxoIJK41L97/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Automation</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-2 mb-3"><span class="px-2 py-1 text-[10px] uppercase font-bold bg-red-600 text-white rounded-sm">YouTube</span></div>
+                        <h3 class="font-display text-xl font-bold">Automation Reel</h3>
+                    </div>
+                </div>
+
+                <!-- === TAB 6: GAMEPLAY === -->
+                <div class="portfolio-item gameplay hidden glass-panel rounded-2xl overflow-hidden group md:col-span-2">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1jqaQK6QCrZdSLrNtotXTasvmC3wwoOA-/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Gaming</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">Gameplay Highlight</h3>
+                        <p class="text-sm text-gray-400 mt-1">Dynamic cuts & SFX.</p>
+                    </div>
+                </div>
+
+                <!-- === TAB 7: DUBBING & LOCALIZATION === -->
+                <!-- Language Dub 1 -->
+                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/19nRZfuvxOezmaldEeP8ILRTVQHC-jEYF/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">Language Dub 1</h3>
+                        <p class="text-sm text-gray-400 mt-1">Audio Synchronization.</p>
+                    </div>
+                </div>
+
+                <!-- Language Dub 2 -->
+                <div class="portfolio-item dubbing hidden glass-panel rounded-2xl overflow-hidden group">
+                    <div class="relative w-full aspect-video video-facade bg-brand-gray" data-src="https://drive.google.com/file/d/1zYZ43nUH6XBxfIKAMmBrTZ3oq0ohLoSe/preview">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10"><span class="text-gray-600 text-xs tracking-widest uppercase">Preview</span></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                            <button class="play-btn w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold">Language Dub 2</h3>
+                        <p class="text-sm text-gray-400 mt-1">Localization.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services / Technical Stack (Color Grading Removed) -->
+    <section id="services" class="py-24 bg-brand-card relative">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="font-display text-4xl font-bold mb-6">Technical Arsenal</h2>
+                    <p class="text-gray-400 text-lg mb-8">
+                        I don't just cut clips. I engineer visual experiences using industry-standard tools and modern retention psychology.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <!-- Skill Bar -->
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-bold">Premiere Pro (Advanced)</span>
+                                <span class="text-brand-gold">95%</span>
+                            </div>
+                            <div class="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-brand-gold w-[95%]"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Skill Bar -->
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-bold">Sound Design (Audition)</span>
+                                <span class="text-brand-gold">85%</span>
+                            </div>
+                            <div class="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-brand-gold w-[85%]"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Skill Bar -->
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-bold">CapCut (Short Form)</span>
+                                <span class="text-brand-gold">100%</span>
+                            </div>
+                            <div class="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-brand-gold w-[100%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20">
+                        <span class="material-symbols-outlined text-4xl text-brand-gold mb-4">movie_edit</span>
+                        <h3 class="font-bold text-lg mb-2">Video Editing</h3>
+                        <p class="text-sm text-gray-500">Pacing, narrative flow, and engaging cuts.</p>
+                    </div>
+                    
+                    <!-- Color Grading Removed -->
+                    <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20">
+                        <span class="material-symbols-outlined text-4xl text-brand-gold mb-4">equalizer</span>
+                        <h3 class="font-bold text-lg mb-2">Sound Design</h3>
+                        <p class="text-sm text-gray-500">Immersive audio mixing and SFX.</p>
+                    </div>
+                    
+                    <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 col-span-2">
+                        <span class="material-symbols-outlined text-4xl text-brand-gold mb-4">bolt</span>
+                        <h3 class="font-bold text-lg mb-2">Viral Reels</h3>
+                        <p class="text-sm text-gray-500">Optimized for TikTok & IG algorithm.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-brand-gold/5 pointer-events-none"></div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h2 class="font-display text-5xl md:text-6xl font-bold mb-8">Ready to Scale?</h2>
+            <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                Stop losing viewers to boring edits. Let's create content that demands attention.
+            </p>
+            
+            <a href="mailto:tatad5289@gmail.com" class="inline-flex items-center gap-3 px-10 py-5 bg-white text-black font-bold rounded-full text-lg hover:bg-brand-gold transition-colors shadow-xl shadow-white/5">
+                <span class="material-symbols-outlined">mail</span>
+                tatad5289@gmail.com
+            </a>
+            
+            <div class="mt-16 flex justify-center gap-8">
+                <a href="https://www.facebook.com/share/r/182sQFtGVW/" target="_blank" class="text-gray-500 hover:text-brand-gold transition-colors">
+                    <span class="text-sm font-bold tracking-widest uppercase">Facebook</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-brand-gold transition-colors">
+                    <span class="text-sm font-bold tracking-widest uppercase">LinkedIn</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-brand-gold transition-colors">
+                    <span class="text-sm font-bold tracking-widest uppercase">Instagram</span>
+                </a>
+            </div>
+            
+            <footer class="mt-24 text-gray-600 text-sm">
+                &copy; 2026 Ershad Elmaco. All Rights Reserved.
+            </footer>
+        </div>
+    </section>
+
+    <!-- Archive Modal -->
+    <div id="archive-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-2xl p-8 rounded-2xl relative m-4 border border-brand-gold/30">
+            <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <span class="material-symbols-outlined text-3xl">close</span>
+            </button>
+            
+            <h3 class="font-display text-2xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-brand-gold">///</span> Facebook Archives
+            </h3>
+            
+            <ul class="space-y-4">
+                <li>
+                    <a href="https://www.facebook.com/share/r/182sQFtGVW/" target="_blank" class="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 hover:translate-x-2 transition-all group">
+                        <span class="font-medium text-gray-300 group-hover:text-brand-gold">SCUAA Interviews</span>
+                        <span class="material-symbols-outlined text-gray-500 group-hover:text-white">open_in_new</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/share/r/16VDQCkc2d/" target="_blank" class="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 hover:translate-x-2 transition-all group">
+                        <span class="font-medium text-gray-300 group-hover:text-brand-gold">First Day of School SDE</span>
+                        <span class="material-symbols-outlined text-gray-500 group-hover:text-white">open_in_new</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/share/r/1AWwct7AN1/" target="_blank" class="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 hover:translate-x-2 transition-all group">
+                        <span class="font-medium text-gray-300 group-hover:text-brand-gold">General Orientation SDE</span>
+                        <span class="material-symbols-outlined text-gray-500 group-hover:text-white">open_in_new</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. Filter Tabs Logic ---
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    tabButtons.forEach(b => b.classList.remove('active', 'text-black', 'bg-brand-gold'));
+                    tabButtons.forEach(b => b.classList.add('text-gray-400'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    btn.classList.remove('text-gray-400');
+                    
+                    const filter = btn.getAttribute('data-filter');
+
+                    // Filter Items with Animation
+                    portfolioItems.forEach(item => {
+                        if (item.classList.contains(filter)) {
+                            item.classList.remove('hidden');
+                            item.classList.add('animate-fade-in');
+                        } else {
+                            item.classList.add('hidden');
+                            item.classList.remove('animate-fade-in');
+                        }
+                    });
+                });
+            });
+
+            // --- 2. Video Facade Logic ---
+            const facades = document.querySelectorAll('.video-facade');
+            
+            facades.forEach(facade => {
+                facade.addEventListener('click', function() {
+                    const src = this.getAttribute('data-src');
+                    // Create iframe
+                    const iframe = document.createElement('iframe');
+                    iframe.setAttribute('src', src);
+                    iframe.setAttribute('allow', 'autoplay; encrypted-media');
+                    iframe.setAttribute('allowfullscreen', '');
+                    iframe.classList.add('absolute', 'inset-0', 'w-full', 'h-full', 'z-30');
+                    
+                    // Clear inner content and append iframe
+                    this.innerHTML = ''; 
+                    this.appendChild(iframe);
+                });
+            });
+
+            // --- 3. Modal Logic ---
+            const modal = document.getElementById('archive-modal');
+            const openBtn = document.getElementById('fb-archive-trigger');
+            const closeBtn = document.getElementById('close-modal');
+
+            function toggleModal(show) {
+                if (show) {
+                    modal.classList.remove('hidden');
+                    setTimeout(() => modal.classList.remove('opacity-0'), 10);
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    }, 300);
+                }
+            }
+
+            if(openBtn) openBtn.addEventListener('click', () => toggleModal(true));
+            if(closeBtn) closeBtn.addEventListener('click', () => toggleModal(false));
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) toggleModal(false);
+            });
+
+            // --- 4. Entrance Animations ---
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.glass-panel').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
