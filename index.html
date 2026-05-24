@@ -98,104 +98,6 @@
                 box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
                 transform: translateY(-2px);
             }
-
-            .video-facade:hover .thumbnail-img {
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
-
-            .video-facade:hover .play-btn {
-                transform: scale(1.1);
-                background-color: #d4af37;
-                color: black;
-                border-color: #d4af37;
-            }
-
-            .video-facade:hover .preview-bar {
-                width: 100%;
-            }
-
-            .video-facade .absolute.bg-black\/0:hover {
-                background-color: rgba(0, 0, 0, 0.2);
-            }
-        }
-
-        /* MOBILE OPTIMIZATION: Fix for "Ghost Buttons" */
-        /* On devices without hover (phones/tablets), force visibility */
-        @media (hover: none) {
-            .play-btn {
-                background-color: #d4af37 !important;
-                /* Always Gold */
-                color: black !important;
-                border-color: #d4af37 !important;
-                transform: scale(1) !important;
-                opacity: 1 !important;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            }
-
-            /* Always show the overlay slightly darkened so text is readable */
-            .video-facade .absolute.z-30 {
-                background-color: rgba(0, 0, 0, 0.1);
-            }
-
-            /* Make the preview bar visible as a subtle line */
-            .preview-bar {
-                width: 100% !important;
-                opacity: 0.5;
-            }
-
-            /* Disable the "Preview" text hover effect, just show it or hide it */
-            .group-hover\:opacity-0 {
-                opacity: 0 !important;
-                /* Hide "Preview" text on mobile, play button is enough */
-            }
-        }
-
-        /* Video Facade Styling */
-        .video-facade {
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-            border-radius: 1rem 1rem 0 0;
-            background: linear-gradient(45deg, #0f0f0f, #1a1a1a);
-        }
-
-        .video-facade::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
-            background-size: 20px 20px;
-            opacity: 0.5;
-            z-index: 1;
-        }
-
-        .play-btn {
-            z-index: 40;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        /* Fake Progress Bar */
-        .preview-bar {
-            width: 0%;
-            height: 4px;
-            background: #d4af37;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            transition: width 3s linear;
-            z-index: 40;
-        }
-
-        .video-facade iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 50;
-            border: none;
         }
 
         .tab-btn.active {
@@ -211,39 +113,6 @@
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
-        }
-
-        /* Loading Spinner for Videos */
-        .loader {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #d4af37;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -20px;
-            margin-left: -20px;
-            z-index: 45;
-            /* Below iframe (50) but above background */
-            display: none;
-            /* Hidden by default */
-        }
-
-        .video-facade.loading .loader {
-            display: block;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
         }
 
         .cta-pop-in {
@@ -383,6 +252,10 @@
             grid-template-rows: repeat(2, 1fr);
         }
 
+        .pillar-grid--three {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
         .pillar-grid--mixed {
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: auto auto;
@@ -514,140 +387,6 @@
         .video-card__badge--shorts  { background: #9333ea; color: white; }
         .video-card__badge--archive { background: #059669; color: white; }
 
-        /* --- Bento Grid & Facebook Archive Cards --- */
-        .pillar-grid--bento {
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: auto auto;
-        }
-        .pillar-grid--bento > .video-card {
-            grid-column: span 2;
-        }
-        @media (max-width: 1023px) {
-            .pillar-grid--bento {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .pillar-grid--bento > .video-card,
-            .pillar-grid--bento > .fb-archive-card {
-                grid-column: span 1;
-            }
-        }
-
-        .fb-archive-card {
-            grid-column: span 2;
-            position: relative;
-            border-radius: 1rem;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(24, 119, 242, 0.08) 0%, rgba(18, 18, 18, 0.7) 60%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(24, 119, 242, 0.15);
-            cursor: pointer;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            text-decoration: none;
-            color: inherit;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        @media (hover: hover) {
-            .fb-archive-card:hover {
-                border-color: rgba(212, 175, 55, 0.4);
-                box-shadow: 0 10px 30px -10px rgba(24, 119, 242, 0.2), 0 0 0 1px rgba(24, 119, 242, 0.1);
-            }
-            .fb-archive-card:hover .fb-archive-card__visual {
-                transform: scale(1.03);
-            }
-            .fb-archive-card:hover .fb-archive-card__icon {
-                transform: scale(1.1);
-            }
-            .fb-archive-card:hover .fb-archive-card__arrow {
-                transform: translateX(4px);
-                color: #1877F2;
-            }
-        }
-        .fb-archive-card__visual {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 50%, #050505 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        .fb-archive-card__visual::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle at 1px 1px, rgba(24, 119, 242, 0.06) 1px, transparent 0);
-            background-size: 16px 16px;
-            z-index: 1;
-        }
-        .fb-archive-card__icon {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 50%;
-            background: rgba(24, 119, 242, 0.15);
-            border: 1px solid rgba(24, 119, 242, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-            transition: transform 0.3s ease;
-        }
-        .fb-archive-card__icon svg {
-            width: 1.5rem;
-            height: 1.5rem;
-            fill: #1877F2;
-        }
-        .fb-archive-card__fb-watermark {
-            position: absolute;
-            bottom: 0.75rem;
-            right: 0.75rem;
-            z-index: 2;
-            opacity: 0.2;
-        }
-        .fb-archive-card__fb-watermark svg {
-            width: 1.25rem;
-            height: 1.25rem;
-            fill: #1877F2;
-        }
-        .fb-archive-card__meta {
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .fb-archive-card__badge {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.625rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            border-radius: 0.125rem;
-            background: #1877F2;
-            color: white;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .fb-archive-card__title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: rgba(255,255,255,0.9);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .fb-archive-card__arrow {
-            margin-left: auto;
-            color: rgba(255,255,255,0.4);
-            transition: transform 0.3s ease, color 0.3s ease;
-            flex-shrink: 0;
-        }
-
         .pillar-title {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 2rem;
@@ -695,12 +434,6 @@
             .video-card__thumb-wrap--landscape {
                 aspect-ratio: 16 / 9;
             }
-            .fb-archive-card__visual {
-                max-height: 30vh;
-                width: auto;
-                aspect-ratio: 16 / 9;
-                margin: 0 auto;
-            }
             .video-card__meta {
                 padding: 0.6rem 0.8rem;
             }
@@ -711,17 +444,6 @@
                 padding: 0.15rem 0.4rem;
                 font-size: 0.55rem;
                 margin-bottom: 0.35rem;
-            }
-            .fb-archive-card__meta {
-                padding: 0.6rem 0.8rem;
-                gap: 0.5rem;
-            }
-            .fb-archive-card__title {
-                font-size: 0.85rem;
-            }
-            .fb-archive-card__badge {
-                padding: 0.15rem 0.4rem;
-                font-size: 0.55rem;
             }
         }
 
@@ -768,6 +490,16 @@
             0% { height: 4px; }
             100% { height: 20px; }
         }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -794,7 +526,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <!-- Hero Section with GSAP Scale-Down Pinning -->
     <div id="hero-viewport">
         <div id="hero-sizzle-container">
@@ -832,7 +563,9 @@
                 <h2 class="pillar-title">High-Retention <span class="pillar-title__accent">&</span> Conversions</h2>
                 <div class="pillar-grid pillar-grid--quad">
                     <!-- VSL 1 -->
-                    <div class="video-card" data-video-id="GbIO_yqYP54">
+                    <div class="video-card" data-video-id="GbIO_yqYP54"
+                         data-metric-left="65% Retention Rate"
+                         data-metric-right="Sound Design &bull; Rapid-Fire Pacing">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/GbIO_yqYP54/maxresdefault.jpg" alt="VSL 1" loading="lazy">
                             <button class="video-card__play">
@@ -842,11 +575,13 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--vsl">VSL</span>
                             <h3 class="font-display text-lg font-bold">VSL Campaign — High Retention</h3>
-                            <p class="text-xs text-brand-gold mt-1">65% Retention Rate &bull; Fast-Turnaround Pacing</p>
+                            <p class="text-xs text-brand-gold mt-1">65% Retention Rate &bull; Rapid-Fire Pacing</p>
                         </div>
                     </div>
                     <!-- VSL 2 -->
-                    <div class="video-card" data-video-id="u0h5kLsBeFA">
+                    <div class="video-card" data-video-id="u0h5kLsBeFA"
+                         data-metric-left="UGC High-Converting"
+                         data-metric-right="40% Increase in Viewer Engagement">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/u0h5kLsBeFA/maxresdefault.jpg" alt="VSL 2" loading="lazy">
                             <button class="video-card__play">
@@ -856,11 +591,13 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--vsl">VSL</span>
                             <h3 class="font-display text-lg font-bold">UGC VSL Asset</h3>
-                            <p class="text-xs text-brand-gold mt-1">40% Increase in Direct Viewer Conversion</p>
+                            <p class="text-xs text-brand-gold mt-1">40% Increase in Viewer Engagement</p>
                         </div>
                     </div>
                     <!-- Talking Head 2 -->
-                    <div class="video-card" data-video-id="ql2P7xAj8Xs">
+                    <div class="video-card" data-video-id="ql2P7xAj8Xs"
+                         data-metric-left="Viral Presentation"
+                         data-metric-right="5K+ Views within 1 Week &bull; SFX">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/ql2P7xAj8Xs/maxresdefault.jpg" alt="Talking Head" loading="lazy">
                             <button class="video-card__play">
@@ -874,7 +611,9 @@
                         </div>
                     </div>
                     <!-- Beverage Showcase -->
-                    <div class="video-card" data-video-id="gzi9n2tPnOE">
+                    <div class="video-card" data-video-id="gzi9n2tPnOE"
+                         data-metric-left="Product Showcase"
+                         data-metric-right="Cinematic Color Grading &bull; Clean Speed Ramps">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/gzi9n2tPnOE/maxresdefault.jpg" alt="Beverage Showcase" loading="lazy">
                             <button class="video-card__play">
@@ -884,6 +623,7 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--ugc">Showcase</span>
                             <h3 class="font-display text-lg font-bold">Beverage Showcase</h3>
+                            <p class="text-xs text-brand-gold mt-1">Cinematic Color Grading &bull; Speed Ramps</p>
                         </div>
                     </div>
                 </div>
@@ -893,9 +633,11 @@
             <div class="horizontal-panel">
                 <span class="pillar-watermark">02</span>
                 <h2 class="pillar-title">Corporate <span class="pillar-title__accent">&</span> Premium Identity</h2>
-                <div class="pillar-grid pillar-grid--quad">
+                <div class="pillar-grid pillar-grid--three">
                     <!-- Real Estate 1 -->
-                    <div class="video-card" data-video-id="dlOzDGhKINo">
+                    <div class="video-card" data-video-id="dlOzDGhKINo"
+                         data-metric-left="Premium Property Promo"
+                         data-metric-right="Phone Footage &bull; High-Retention Transitions">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/dlOzDGhKINo/maxresdefault.jpg" alt="Real Estate 1" loading="lazy">
                             <button class="video-card__play">
@@ -904,11 +646,14 @@
                         </div>
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--corp">Corporate</span>
-                            <h3 class="font-display text-lg font-bold">Real Estate 1</h3>
+                            <h3 class="font-display text-lg font-bold">Premium Real Estate Walkthrough</h3>
+                            <p class="text-xs text-brand-gold mt-1">Phone Footage &bull; High-Retention Transitions</p>
                         </div>
                     </div>
                     <!-- Real Estate 2 -->
-                    <div class="video-card" data-video-id="wOKvf4_xyuo">
+                    <div class="video-card" data-video-id="wOKvf4_xyuo"
+                         data-metric-left="Luxury Walkthrough"
+                         data-metric-right="Smooth Handheld Stabilization &bull; Ambient Exposure Maps">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/wOKvf4_xyuo/maxresdefault.jpg" alt="Real Estate 2" loading="lazy">
                             <button class="video-card__play">
@@ -918,10 +663,13 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--corp">Corporate</span>
                             <h3 class="font-display text-lg font-bold">Real Estate 2</h3>
+                            <p class="text-xs text-brand-gold mt-1">Smooth Stabilization &bull; Luxury Color Palette</p>
                         </div>
                     </div>
                     <!-- Neurology Services -->
-                    <div class="video-card" data-video-id="WZunFxVDESI">
+                    <div class="video-card" data-video-id="WZunFxVDESI"
+                         data-metric-left="Corporate Presentation"
+                         data-metric-right="Informative Motion Graphics &bull; Clean Corporate Pacing">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/WZunFxVDESI/maxresdefault.jpg" alt="Neurology Services" loading="lazy">
                             <button class="video-card__play">
@@ -931,6 +679,7 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--corp">Medical</span>
                             <h3 class="font-display text-lg font-bold">Neurology Services</h3>
+                            <p class="text-xs text-brand-gold mt-1">Corporate Graphics &bull; Institutional Pacing</p>
                         </div>
                     </div>
                 </div>
@@ -942,7 +691,9 @@
                 <h2 class="pillar-title">AI Workflows <span class="pillar-title__accent">&</span> Narratives</h2>
                 <div class="pillar-grid pillar-grid--mixed">
                     <!-- AI Automated 1 -->
-                    <div class="video-card" data-video-id="honXnuby9OQ">
+                    <div class="video-card" data-video-id="honXnuby9OQ"
+                         data-metric-left="Generative Narrative"
+                         data-metric-right="Google Veo 3.1 &bull; Automated Visual Flow">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/honXnuby9OQ/maxresdefault.jpg" alt="AI Automated 1" loading="lazy">
                             <button class="video-card__play">
@@ -952,10 +703,13 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--ai">AI</span>
                             <h3 class="font-display text-lg font-bold">AI Automated 1</h3>
+                            <p class="text-xs text-brand-gold mt-1">Google Veo 3.1 &bull; Automated Visual Flow</p>
                         </div>
                     </div>
                     <!-- AI Automated 2 -->
-                    <div class="video-card" data-video-id="2nuzdKu2r1k">
+                    <div class="video-card" data-video-id="2nuzdKu2r1k"
+                         data-metric-left="Advanced AI Workflow"
+                         data-metric-right="Custom Transition Masks &bull; Cinematic B-Roll Sync">
                         <div class="video-card__thumb-wrap">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/2nuzdKu2r1k/maxresdefault.jpg" alt="AI Automated 2" loading="lazy">
                             <button class="video-card__play">
@@ -965,10 +719,13 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--ai">AI</span>
                             <h3 class="font-display text-lg font-bold">AI Automated 2</h3>
+                            <p class="text-xs text-brand-gold mt-1">Custom Masking &bull; Cinematic B-Roll Sync</p>
                         </div>
                     </div>
                     <!-- YouTube Gameplay (Wide 16:9) -->
-                    <div class="video-card video-card--wide" data-video-id="cPLIGshFkHo">
+                    <div class="video-card video-card--wide" data-video-id="cPLIGshFkHo"
+                         data-metric-left="Long-Form Gameplay"
+                         data-metric-right="Dynamic Cuts &bull; Structural SFX Overlays">
                         <div class="video-card__thumb-wrap video-card__thumb-wrap--landscape">
                             <img class="video-card__thumb" src="https://img.youtube.com/vi/cPLIGshFkHo/maxresdefault.jpg" alt="YouTube Gameplay" loading="lazy">
                             <button class="video-card__play">
@@ -978,7 +735,7 @@
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--ai">YouTube</span>
                             <h3 class="font-display text-lg font-bold">Long-Form Gameplay</h3>
-                            <p class="text-sm text-gray-400 mt-1">Dynamic cuts & SFX.</p>
+                            <p class="text-xs text-brand-gold mt-1">Dynamic Timeline Cuts &bull; Immersive SFX Mix</p>
                         </div>
                     </div>
                 </div>
@@ -1109,8 +866,21 @@
             <span class="material-symbols-outlined text-sm">volume_off</span>
             Unmute Video
         </button>
-        <div id="theatre-modal__player-wrap" class="relative w-[90vw] max-w-[960px] aspect-video rounded-xl overflow-hidden shadow-2xl shadow-brand-gold/15 scale-95 transition-transform duration-300 ease-out">
-            <div id="theatre-player-target" class="w-full h-full"></div>
+        
+        <div class="flex flex-row items-center justify-center gap-12 w-full max-w-6xl z-[205] px-6">
+            <div id="modal-panel-left" class="hidden md:flex flex-col p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md w-64 opacity-0">
+                <span class="text-[10px] text-brand-gold uppercase tracking-widest font-bold mb-1">Campaign Performance</span>
+                <h4 id="modal-text-left" class="font-display text-lg font-bold text-white leading-tight"></h4>
+            </div>
+
+            <div id="theatre-modal__player-wrap" class="relative w-[90vw] max-w-[960px] aspect-video rounded-xl overflow-hidden shadow-2xl shadow-brand-gold/15 scale-95 transition-transform duration-300 ease-out flex-shrink-0">
+                <div id="theatre-player-target" class="w-full h-full"></div>
+            </div>
+
+            <div id="modal-panel-right" class="hidden md:flex flex-col p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md w-64 opacity-0">
+                <span class="text-[10px] text-brand-gold uppercase tracking-widest font-bold mb-1">Editing & Execution</span>
+                <h4 id="modal-text-right" class="font-display text-sm text-gray-300 leading-relaxed"></h4>
+            </div>
         </div>
         
         <!-- Fallback Link/Message -->
@@ -1178,6 +948,30 @@
     </div>
 
     <script>
+        // Global variables and callback for the YouTube Iframe Player SDK to prevent race conditions
+        let ytPlayerInstance = null;
+        let isPlayerReady = false;
+
+        window.onYouTubeIframeAPIReady = function() {
+            ytPlayerInstance = new YT.Player('theatre-player-target', {
+                height: '100%',
+                width: '100%',
+                playerVars: {
+                    'autoplay': 1,
+                    'mute': 1,
+                    'loop': 1,
+                    'rel': 0,
+                    'controls': 1,
+                    'modestbranding': 1,
+                    'enablejsapi': 1,
+                    'origin': window.location.origin
+                },
+                events: {
+                    'onReady': () => { isPlayerReady = true; }
+                }
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.protocol === 'file:') {
                 document.getElementById('protocol-warning')?.classList.remove('hidden');
@@ -1387,8 +1181,8 @@
                             }
                         });
 
-                        // Staggered horizontal animations for all video and Facebook cards
-                        gsap.utils.toArray('.video-card, .fb-archive-card').forEach(card => {
+                        // Staggered horizontal animations for all video cards
+                        gsap.utils.toArray('.video-card').forEach(card => {
                             gsap.to(card, {
                                 opacity: 1,
                                 y: 0,
@@ -1436,8 +1230,8 @@
                             });
                         });
 
-                        // Staggered vertical animations for all video and Facebook cards on mobile
-                        gsap.utils.toArray('.video-card, .fb-archive-card').forEach(card => {
+                        // Staggered vertical animations for all video cards on mobile
+                        gsap.utils.toArray('.video-card').forEach(card => {
                             gsap.to(card, {
                                 opacity: 1,
                                 y: 0,
@@ -1535,30 +1329,6 @@
             const closeBtn    = document.getElementById('theatre-modal__close');
             const unmuteBtn   = document.getElementById('theatre-unmute-btn');
 
-            let ytPlayerInstance = null;
-            let isPlayerReady = false;
-
-            // The global callback entry hook required by the YouTube SDK bootstrap process
-            window.onYouTubeIframeAPIReady = function() {
-                ytPlayerInstance = new YT.Player('theatre-player-target', {
-                    height: '100%',
-                    width: '100%',
-                    playerVars: {
-                        'autoplay': 1,
-                        'mute': 1,
-                        'loop': 1,
-                        'rel': 0,
-                        'controls': 1,
-                        'modestbranding': 1,
-                        'enablejsapi': 1,
-                        'origin': window.location.origin
-                    },
-                    events: {
-                        'onReady': () => { isPlayerReady = true; }
-                    }
-                });
-            };
-
             function openVideo(videoId) {
                 const isShort = videoId !== 'cPLIGshFkHo'; // only gameplay is horizontal 16:9
                 const isLocalFile = window.location.protocol === 'file:';
@@ -1573,13 +1343,21 @@
                     playerWrap.style.maxWidth = '960px';
                 }
 
+                // Query matching data fields from the active card layout selection
+                const cardEl = document.querySelector(`.video-card[data-video-id="${videoId}"]`);
+                const leftText = cardEl ? cardEl.getAttribute('data-metric-left') : '';
+                const rightText = cardEl ? cardEl.getAttribute('data-metric-right') : '';
+
+                document.getElementById('modal-text-left').innerHTML = leftText || 'Premium Production';
+                document.getElementById('modal-text-right').innerHTML = rightText || 'Advanced Visual Flow';
+
                 // Synchronously fire video loading through the persistent API bridge hook
                 if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
                     ytPlayerInstance.loadVideoById({
                         videoId: videoId,
                         startSeconds: 0
                     });
-                    ytPlayerInstance.mute(); // Enforce mute rules strictly inside the gesture thread
+                    ytPlayerInstance.mute(); // Enforce muted state inside user gesture context
                 } else {
                     // Robust micro-fallback for race conditions during initial frame boots
                     const fallbackIframe = document.querySelector('#theatre-modal__player-wrap iframe');
@@ -1615,6 +1393,12 @@
                 theatreModal.classList.add('opacity-100', 'pointer-events-auto');
                 playerWrap.classList.remove('scale-95');
                 playerWrap.classList.add('scale-100');
+
+                // GSAP side-slide transitions
+                if (leftText || rightText) {
+                    gsap.fromTo('#modal-panel-left', { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, delay: 0.2, ease: 'power3.out' });
+                    gsap.fromTo('#modal-panel-right', { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, delay: 0.2, ease: 'power3.out' });
+                }
                 
                 document.body.style.overflow = 'hidden';
             }
@@ -1640,6 +1424,10 @@
                 theatreModal.classList.add('opacity-0', 'pointer-events-none');
                 playerWrap.classList.remove('scale-100');
                 playerWrap.classList.add('scale-95');
+
+                // Close Reset: Reset panel properties back to baseline hidden values (opacity: 0, x: -40 / 40)
+                gsap.set('#modal-panel-left', { opacity: 0, x: -40 });
+                gsap.set('#modal-panel-right', { opacity: 0, x: 40 });
                 
                 document.body.style.overflow = '';
                 setTimeout(() => { 
