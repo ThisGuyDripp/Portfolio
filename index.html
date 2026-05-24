@@ -1621,23 +1621,6 @@
                 }, 300);
             }
 
-            // PostMessage Hover Listeners
-            if (playerWrap) {
-                playerWrap.addEventListener('mouseenter', () => {
-                    const iframe = document.getElementById('theatre-iframe');
-                    if (iframe && iframe.contentWindow) {
-                        iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', 'https://www.youtube.com');
-                    }
-                });
-
-                playerWrap.addEventListener('mouseleave', () => {
-                    const iframe = document.getElementById('theatre-iframe');
-                    if (iframe && iframe.contentWindow) {
-                        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', 'https://www.youtube.com');
-                    }
-                });
-            }
-
             // Unmute Button Click Listener
             if (unmuteBtn) {
                 unmuteBtn.addEventListener('click', () => {
