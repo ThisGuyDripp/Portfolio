@@ -1524,7 +1524,7 @@
                 const isShort = videoId !== 'cPLIGshFkHo'; // only gameplay is horizontal 16:9
                 const isLocalFile = window.location.protocol === 'file:';
                 
-                // Construct embed URL with API commands enabled
+                // Construct a bulletproof autoplay query string. Autoplay requires muted=1 to satisfy browser security layers on first load.
                 const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&modestbranding=1&controls=1&enablejsapi=1`;
 
                 if (isShort) {
@@ -1535,8 +1535,16 @@
                     playerWrap.style.maxWidth = '960px';
                 }
 
-                // Inject iframe directly with autoplay permissions and enablejsapi=1
-                playerWrap.innerHTML = `<iframe id="theatre-iframe" class="w-full h-full border-none" src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+                // Inject the iframe with explicit browser permission delegation attributes
+                playerWrap.innerHTML = `
+                    <iframe 
+                        id="theatre-iframe" 
+                        class="w-full h-full border-none" 
+                        src="${embedUrl}" 
+                        allow="autoplay; encrypted-media; picture-in-picture; fullscreen" 
+                        allowfullscreen>
+                    </iframe>
+                `;
                 
                 // Dynamic fallback link update
                 const fallbackBtn = document.getElementById('theatre-modal__fallback-btn');
@@ -1573,7 +1581,7 @@
             const openTheatre = openVideo;
 
             function closeTheatre() {
-                // Destroy iframe to stop video and audio playback immediately
+                // Destroy player frame to stop all data streams immediately
                 playerWrap.innerHTML = '';
 
                 // Hide and reset unmute button
