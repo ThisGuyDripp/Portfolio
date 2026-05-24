@@ -393,12 +393,15 @@
         }
 
         @media (max-width: 767px) {
-            .pillar-grid--quad,
-            .pillar-grid--mixed {
-                grid-template-columns: 1fr;
+            .pillar-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.5rem !important;
             }
-            .pillar-grid--mixed .video-card--wide {
-                grid-column: auto;
+            .video-card--wide {
+                grid-column: span 2 !important; /* Force landscape gameplay clip to span gracefully */
+            }
+            .video-card__meta h3 {
+                font-size: 0.85rem !important;
             }
         }
 
@@ -526,11 +529,6 @@
             .pillar-grid--bento > .video-card,
             .pillar-grid--bento > .fb-archive-card {
                 grid-column: span 1;
-            }
-        }
-        @media (max-width: 767px) {
-            .pillar-grid--bento {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -843,7 +841,8 @@
                         </div>
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--vsl">VSL</span>
-                            <h3 class="font-display text-lg font-bold">VSL 1</h3>
+                            <h3 class="font-display text-lg font-bold">VSL Campaign — High Retention</h3>
+                            <p class="text-xs text-brand-gold mt-1">65% Retention Rate &bull; Fast-Turnaround Pacing</p>
                         </div>
                     </div>
                     <!-- VSL 2 -->
@@ -856,7 +855,8 @@
                         </div>
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--vsl">VSL</span>
-                            <h3 class="font-display text-lg font-bold">VSL 2</h3>
+                            <h3 class="font-display text-lg font-bold">UGC VSL Asset</h3>
+                            <p class="text-xs text-brand-gold mt-1">40% Increase in Direct Viewer Conversion</p>
                         </div>
                     </div>
                     <!-- Talking Head 2 -->
@@ -869,7 +869,8 @@
                         </div>
                         <div class="video-card__meta">
                             <span class="video-card__badge video-card__badge--shorts">Shorts</span>
-                            <h3 class="font-display text-lg font-bold">Talking Head</h3>
+                            <h3 class="font-display text-lg font-bold">Viral Presentation</h3>
+                            <p class="text-xs text-brand-gold mt-1">5K+ Views within 1 Week &bull; Sound Design</p>
                         </div>
                     </div>
                     <!-- Beverage Showcase -->
@@ -1561,6 +1562,8 @@
             function openVideo(videoId) {
                 const isShort = videoId !== 'cPLIGshFkHo'; // only gameplay is horizontal 16:9
                 const isLocalFile = window.location.protocol === 'file:';
+                
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&modestbranding=1&controls=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
 
                 if (isShort) {
                     playerWrap.style.aspectRatio = '9 / 16';
@@ -1581,7 +1584,7 @@
                     // Robust micro-fallback for race conditions during initial frame boots
                     const fallbackIframe = document.querySelector('#theatre-modal__player-wrap iframe');
                     if (fallbackIframe) {
-                        fallbackIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&modestbranding=1&controls=1&enablejsapi=1`;
+                        fallbackIframe.src = embedUrl;
                     }
                 }
                 
