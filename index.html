@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ershad Elmaco | High-Retention Video Editor</title>
+    <meta name="description"
+        content="Portfolio of Ershad Elmaco. Specializing in high-retention VSLs, UGC, and viral short-form content.">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js for WebGL Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#d4af37',
+                            dark: '#050505',
+                            card: '#121212',
+                            gray: '#1f1f1f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* FIXED: Body background must be transparent for WebGL (z-index: -1) to show through */
+        html {
+            background-color: #050505;
+            /* Solid fallback for repaint glitches */
+        }
+
+        body {
+            background-color: transparent;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            /* Prevent horizontal scroll on body */
+        }
+
+        /* WebGL Container - Fixed background */
+        #webgl-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #050505;
+        }
+
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        /* Desktop Hover Effects */
+        @media (hover: hover) {
+            .glass-panel:hover {
+                border-color: rgba(212, 175, 55, 0.3);
+                box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+                transform: translateY(-2px);
+            }
+
+            .video-facade:hover .thumbnail-img {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+
+            .video-facade:hover .play-btn {
+                transform: scale(1.1);
+                background-color: #d4af37;
+                color: black;
+                border-color: #d4af37;
+            }
+
+            .video-facade:hover .preview-bar {
+                width: 100%;
+            }
+
+            .video-facade .absolute.bg-black\/0:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        /* MOBILE OPTIMIZATION: Fix for "Ghost Buttons" */
+        /* On devices without hover (phones/tablets), force visibility */
+        @media (hover: none) {
+            .play-btn {
+                background-color: #d4af37 !important;
+                /* Always Gold */
+                color: black !important;
+                border-color: #d4af37 !important;
+                transform: scale(1) !important;
+                opacity: 1 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            }
+
+            /* Always show the overlay slightly darkened so text is readable */
+            .video-facade .absolute.z-30 {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+
+            /* Make the preview bar visible as a subtle line */
+            .preview-bar {
+                width: 100% !important;
+                opacity: 0.5;
+            }
+
+            /* Disable the "Preview" text hover effect, just show it or hide it */
+            .group-hover\:opacity-0 {
+                opacity: 0 !important;
+                /* Hide "Preview" text on mobile, play button is enough */
+            }
+        }
+
+        /* Video Facade Styling */
+        .video-facade {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 1rem 1rem 0 0;
+            background: linear-gradient(45deg, #0f0f0f, #1a1a1a);
+        }
+
+        .video-facade::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 20px 20px;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .play-btn {
+            z-index: 40;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Fake Progress Bar */
+        .preview-bar {
+            width: 0%;
+            height: 4px;
+            background: #d4af37;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transition: width 3s linear;
+            z-index: 40;
+        }
+
+        .video-facade iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            border: none;
+        }
+
+        .tab-btn.active {
+            background-color: #d4af37;
+            color: black;
+            border-color: #d4af37;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Loading Spinner for Videos */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #d4af37;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -20px;
+            margin-left: -20px;
+            z-index: 45;
+            /* Below iframe (50) but above background */
+            display: none;
+            /* Hidden by default */
+        }
+
+        .video-facade.loading .loader {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .cta-pop-in {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- GSAP ScrollTrigger Overhaul CSS --- */
+        :root {
+            --color-bg-primary: #050505;
+            --color-bg-charcoal: #0a0a0a;
+            --color-bg-card: #121212;
+            --color-gold: #d4af37;
+            --color-gold-20: rgba(212, 175, 55, 0.2);
+            --hero-scale: 1;
+            --hero-radius: 0px;
+            --hero-opacity: 1;
+            --section-bg: #050505;
+        }
+
+        html {
+            overscroll-behavior: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        #hero-viewport {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            will-change: transform;
+        }
+
+        #hero-sizzle-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            transform-origin: center center;
+            border-radius: var(--hero-radius);
+            overflow: hidden;
+            will-change: transform, border-radius;
+            background-color: #050505;
+        }
+
+        #hero-sizzle-container .hero-vignette {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.4) 100%);
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        #hero-sizzle-container .hero-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        #scroll-wrapper {
+            position: relative;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        #horizontal-section {
+            position: relative;
+            height: 100vh;
+            width: 300vw;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        .horizontal-panel {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 3rem;
+            position: relative;
+            flex-shrink: 0;
+            background-color: transparent;
+        }
+
+        @media (max-width: 767px) {
+            #horizontal-section {
+                width: 100%;
+                height: auto;
+                flex-direction: column;
+            }
+            .horizontal-panel {
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        .pillar-grid {
+            display: grid;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+
+        .pillar-grid--quad {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .pillar-grid--mixed {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto;
+        }
+
+        .pillar-grid--mixed .video-card--wide {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 767px) {
+            .pillar-grid--quad,
+            .pillar-grid--mixed {
+                grid-template-columns: 1fr;
+            }
+            .pillar-grid--mixed .video-card--wide {
+                grid-column: auto;
+            }
+        }
+
+        .video-card {
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @media (hover: hover) {
+            .video-card:hover {
+                border-color: rgba(212, 175, 55, 0.4);
+                box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            }
+            .video-card:hover .video-card__thumb-wrap {
+                transform: scale(1.03);
+            }
+        }
+
+        .video-card__thumb-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9 / 16;
+            overflow: hidden;
+            background: linear-gradient(45deg, #0f0f0f, #1a1a1a);
+            transition: transform 0.3s ease;
+        }
+
+        .video-card__thumb-wrap--landscape {
+            aspect-ratio: 16 / 9;
+        }
+
+        .video-card__thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        @media (hover: hover) {
+            .video-card:hover .video-card__thumb {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .video-card__play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 40;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        @media (hover: none) {
+            .video-card__play {
+                background-color: var(--color-gold) !important;
+                color: black !important;
+                border-color: var(--color-gold) !important;
+            }
+        }
+
+        @media (hover: hover) {
+            .video-card:hover .video-card__play {
+                background-color: var(--color-gold);
+                color: black;
+                border-color: var(--color-gold);
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        .video-card__meta {
+            padding: 1rem 1.25rem;
+        }
+
+        .video-card__badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 0.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-card__badge--vsl     { background: var(--color-gold); color: black; }
+        .video-card__badge--ugc     { background: var(--color-gold); color: black; }
+        .video-card__badge--corp    { background: #2563eb; color: white; }
+        .video-card__badge--ai      { background: #dc2626; color: white; }
+        .video-card__badge--shorts  { background: #9333ea; color: white; }
+        .video-card__badge--archive { background: #059669; color: white; }
+
+        /* --- Bento Grid & Facebook Archive Cards --- */
+        .pillar-grid--bento {
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: auto auto;
+        }
+        .pillar-grid--bento > .video-card {
+            grid-column: span 2;
+        }
+        @media (max-width: 1023px) {
+            .pillar-grid--bento {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .pillar-grid--bento > .video-card,
+            .pillar-grid--bento > .fb-archive-card {
+                grid-column: span 1;
+            }
+        }
+        @media (max-width: 767px) {
+            .pillar-grid--bento {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fb-archive-card {
+            grid-column: span 2;
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(24, 119, 242, 0.08) 0%, rgba(18, 18, 18, 0.7) 60%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(24, 119, 242, 0.15);
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        @media (hover: hover) {
+            .fb-archive-card:hover {
+                border-color: rgba(212, 175, 55, 0.4);
+                box-shadow: 0 10px 30px -10px rgba(24, 119, 242, 0.2), 0 0 0 1px rgba(24, 119, 242, 0.1);
+            }
+            .fb-archive-card:hover .fb-archive-card__visual {
+                transform: scale(1.03);
+            }
+            .fb-archive-card:hover .fb-archive-card__icon {
+                transform: scale(1.1);
+            }
+            .fb-archive-card:hover .fb-archive-card__arrow {
+                transform: translateX(4px);
+                color: #1877F2;
+            }
+        }
+        .fb-archive-card__visual {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 50%, #050505 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .fb-archive-card__visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 1px 1px, rgba(24, 119, 242, 0.06) 1px, transparent 0);
+            background-size: 16px 16px;
+            z-index: 1;
+        }
+        .fb-archive-card__icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background: rgba(24, 119, 242, 0.15);
+            border: 1px solid rgba(24, 119, 242, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+        .fb-archive-card__icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: #1877F2;
+        }
+        .fb-archive-card__fb-watermark {
+            position: absolute;
+            bottom: 0.75rem;
+            right: 0.75rem;
+            z-index: 2;
+            opacity: 0.2;
+        }
+        .fb-archive-card__fb-watermark svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: #1877F2;
+        }
+        .fb-archive-card__meta {
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .fb-archive-card__badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 0.125rem;
+            background: #1877F2;
+            color: white;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .fb-archive-card__title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fb-archive-card__arrow {
+            margin-left: auto;
+            color: rgba(255,255,255,0.4);
+            transition: transform 0.3s ease, color 0.3s ease;
+            flex-shrink: 0;
+        }
+
+
+
+        .pillar-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .pillar-title__accent {
+            color: var(--color-gold);
+        }
+
+        .pillar-watermark {
+            position: absolute;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.02);
+            pointer-events: none;
+            line-height: 1;
+            z-index: 0;
+        }
+
+        /* Desktop Height Constraints and Spacing Adjustments */
+        @media (min-width: 768px) {
+            .horizontal-panel {
+                padding-top: 6.5rem;
+                padding-bottom: 3.5rem;
+                justify-content: center;
+            }
+            .pillar-title {
+                margin-bottom: 1.25rem;
+            }
+            .video-card__thumb-wrap {
+                max-height: 30vh;
+                width: auto;
+                aspect-ratio: 9 / 16;
+                margin: 0 auto;
+            }
+            .video-card__thumb-wrap--landscape {
+                aspect-ratio: 16 / 9;
+            }
+            .fb-archive-card__visual {
+                max-height: 30vh;
+                width: auto;
+                aspect-ratio: 16 / 9;
+                margin: 0 auto;
+            }
+            .video-card__meta {
+                padding: 0.6rem 0.8rem;
+            }
+            .video-card__meta h3 {
+                font-size: 0.95rem !important;
+            }
+            .video-card__badge {
+                padding: 0.15rem 0.4rem;
+                font-size: 0.55rem;
+                margin-bottom: 0.35rem;
+            }
+            .fb-archive-card__meta {
+                padding: 0.6rem 0.8rem;
+                gap: 0.5rem;
+            }
+            .fb-archive-card__title {
+                font-size: 0.85rem;
+            }
+            .fb-archive-card__badge {
+                padding: 0.15rem 0.4rem;
+                font-size: 0.55rem;
+            }
+        }
+
+        /* Skill Bar & Audio Waveform Styles */
+        .skill-bar-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            background: #d4af37;
+            border-radius: 999px;
+            transform: scaleX(0);
+            transform-origin: left;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .audio-wave-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 24px;
+        }
+
+        .audio-bar {
+            width: 3px;
+            background: #d4af37;
+            border-radius: 999px;
+            animation: wavePulse 1.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes wavePulse {
+            0% { height: 4px; }
+            100% { height: 20px; }
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-brand-gold selection:text-black">
+    <div id="protocol-warning" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[250] w-[90%] max-w-lg bg-red-950/80 backdrop-blur-md border border-red-500/30 text-red-200 px-4 py-3 rounded-xl text-center text-xs font-medium shadow-2xl shadow-red-900/10">
+        ⚠️ Running via local file protocol. Some YouTube embeds may throw Error 150. Use a local development server or live-reload preview for local testing.
+    </div>
+
+    <!-- WebGL Canvas for "Broken Glass" Effect -->
+    <div id="webgl-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md">
+        <div
+            class="glass-panel rounded-full px-6 py-3 flex justify-between items-center shadow-2xl shadow-brand-gold/10">
+            <a href="#" class="font-display font-bold text-lg tracking-tight text-white">ERSHAD<span
+                    class="text-brand-gold">.</span></a>
+            <div class="flex gap-6 text-sm font-medium text-gray-400 items-center">
+                <a href="#scroll-wrapper" class="hover:text-white transition-colors">Work</a>
+                <a href="#services" class="hover:text-white transition-colors">Services</a>
+                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+                <button id="nav-archives-btn" class="hover:text-white transition-colors">Archives</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <!-- Hero Section with GSAP Scale-Down Pinning -->
+    <div id="hero-viewport">
+        <div id="hero-sizzle-container">
+            <div class="hero-vignette"></div>
+            <img src="https://img.youtube.com/vi/cPLIGshFkHo/maxresdefault.jpg"
+                 class="hero-thumb" alt="Sizzle Reel Preview">
+            <div class="hero-text absolute inset-0 flex flex-col justify-center items-center z-30 text-center pointer-events-none px-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse-slow backdrop-blur-sm">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-xs uppercase tracking-widest text-gray-300">Available for 2026 Season</span>
+                </div>
+                <h1 class="font-display text-6xl md:text-8xl font-bold leading-tight mb-6 drop-shadow-2xl">
+                    Turn Viewers Into <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-yellow-200">Obsessed Fans.</span>
+                </h1>
+                <p class="font-sans text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow-md">
+                    Senior Editor & Visual Storyteller. Specializing in high-retention VSLs,
+                    viral short-form content, and cinematic commercial production.
+                </p>
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-white/5 backdrop-blur-md text-brand-gold text-xs uppercase tracking-widest font-semibold animate-pulse-slow">
+                    <span class="material-symbols-outlined text-sm">mouse</span>
+                    Scroll to Enter Cinema
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Portfolio Section (GSAP Horizontal Scroll) -->
+    <div id="scroll-wrapper">
+        <section id="horizontal-section">
+
+            <!-- PILLAR 1: High-Retention & Conversions -->
+            <div class="horizontal-panel">
+                <span class="pillar-watermark">01</span>
+                <h2 class="pillar-title">High-Retention <span class="pillar-title__accent">&</span> Conversions</h2>
+                <div class="pillar-grid pillar-grid--quad">
+                    <!-- VSL 1 -->
+                    <div class="video-card" data-video-id="GbIO_yqYP54">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/GbIO_yqYP54/hqdefault.jpg" alt="VSL 1" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--vsl">VSL</span>
+                            <h3 class="font-display text-lg font-bold">VSL 1</h3>
+                        </div>
+                    </div>
+                    <!-- VSL 2 -->
+                    <div class="video-card" data-video-id="u0h5kLsBeFA">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/u0h5kLsBeFA/hqdefault.jpg" alt="VSL 2" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--vsl">VSL</span>
+                            <h3 class="font-display text-lg font-bold">VSL 2</h3>
+                        </div>
+                    </div>
+                    <!-- Talking Head 2 -->
+                    <div class="video-card" data-video-id="ql2P7xAj8Xs">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/ql2P7xAj8Xs/hqdefault.jpg" alt="Talking Head" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--shorts">Shorts</span>
+                            <h3 class="font-display text-lg font-bold">Talking Head</h3>
+                        </div>
+                    </div>
+                    <!-- Beverage Showcase -->
+                    <div class="video-card" data-video-id="gzi9n2tPnOE">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/gzi9n2tPnOE/hqdefault.jpg" alt="Beverage Showcase" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--ugc">Showcase</span>
+                            <h3 class="font-display text-lg font-bold">Beverage Showcase</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PILLAR 2: Corporate & Premium Identity -->
+            <div class="horizontal-panel">
+                <span class="pillar-watermark">02</span>
+                <h2 class="pillar-title">Corporate <span class="pillar-title__accent">&</span> Premium Identity</h2>
+                <div class="pillar-grid pillar-grid--quad">
+                    <!-- Real Estate 1 -->
+                    <div class="video-card" data-video-id="dlOzDGhKINo">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/dlOzDGhKINo/hqdefault.jpg" alt="Real Estate 1" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--corp">Corporate</span>
+                            <h3 class="font-display text-lg font-bold">Real Estate 1</h3>
+                        </div>
+                    </div>
+                    <!-- Real Estate 2 -->
+                    <div class="video-card" data-video-id="wOKvf4_xyuo">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/wOKvf4_xyuo/hqdefault.jpg" alt="Real Estate 2" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--corp">Corporate</span>
+                            <h3 class="font-display text-lg font-bold">Real Estate 2</h3>
+                        </div>
+                    </div>
+                    <!-- Neurology Services -->
+                    <div class="video-card" data-video-id="WZunFxVDESI">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/WZunFxVDESI/hqdefault.jpg" alt="Neurology Services" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--corp">Medical</span>
+                            <h3 class="font-display text-lg font-bold">Neurology Services</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PILLAR 3: AI Workflows & Narratives -->
+            <div class="horizontal-panel">
+                <span class="pillar-watermark">03</span>
+                <h2 class="pillar-title">AI Workflows <span class="pillar-title__accent">&</span> Narratives</h2>
+                <div class="pillar-grid pillar-grid--mixed">
+                    <!-- AI Automated 1 -->
+                    <div class="video-card" data-video-id="honXnuby9OQ">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/honXnuby9OQ/hqdefault.jpg" alt="AI Automated 1" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--ai">AI</span>
+                            <h3 class="font-display text-lg font-bold">AI Automated 1</h3>
+                        </div>
+                    </div>
+                    <!-- AI Automated 2 -->
+                    <div class="video-card" data-video-id="2nuzdKu2r1k">
+                        <div class="video-card__thumb-wrap">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/2nuzdKu2r1k/hqdefault.jpg" alt="AI Automated 2" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--ai">AI</span>
+                            <h3 class="font-display text-lg font-bold">AI Automated 2</h3>
+                        </div>
+                    </div>
+                    <!-- YouTube Gameplay (Wide 16:9) -->
+                    <div class="video-card video-card--wide" data-video-id="cPLIGshFkHo">
+                        <div class="video-card__thumb-wrap video-card__thumb-wrap--landscape">
+                            <img class="video-card__thumb" src="https://img.youtube.com/vi/cPLIGshFkHo/maxresdefault.jpg" alt="YouTube Gameplay" loading="lazy">
+                            <button class="video-card__play">
+                                <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                            </button>
+                        </div>
+                        <div class="video-card__meta">
+                            <span class="video-card__badge video-card__badge--ai">YouTube</span>
+                            <h3 class="font-display text-lg font-bold">Long-Form Gameplay</h3>
+                            <p class="text-sm text-gray-400 mt-1">Dynamic cuts & SFX.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- Services / Technical Stack (Updated: Interactive Tool Stack & Skill Visualizers) -->
+    <section id="services" class="py-24 bg-transparent relative">
+        <div class="container mx-auto px-6 relative z-10">
+            <h2 class="font-display text-4xl font-bold mb-12 text-center text-white">Engineering Visuals</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1: Adobe Premiere Pro -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">cut</span>
+                            <h3 class="font-bold text-lg text-white">Adobe Premiere Pro</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Intermediate proficiency for complex timeline workflows, precise cuts, and multi-cam editing.</p>
+                    </div>
+                    <div class="skill-bar-track mt-auto">
+                        <div class="skill-bar-fill" data-skill-level="0.75"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: CapCut Desktop -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">speed</span>
+                            <h3 class="font-bold text-lg text-white">CapCut Desktop</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Expert proficiency for rapid short-form video generation, dynamic captions, and fast retention layouts.</p>
+                    </div>
+                    <div class="skill-bar-track mt-auto">
+                        <div class="skill-bar-fill" data-skill-level="0.95"></div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Google Veo 3.1 -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">sparkles</span>
+                            <h3 class="font-bold text-lg text-white">Google Veo 3.1</h3>
+                        </div>
+                        <p class="text-sm text-gray-400">Generative Video Production for custom transition masks & VSL B-rolls.</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: ElevenLabs -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">graphic_eq</span>
+                            <h3 class="font-bold text-lg text-white">ElevenLabs</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Vocal synthesis & high-retention VSL voiceovers with perfectly timed pacing.</p>
+                    </div>
+                    <div class="audio-wave-container mt-auto">
+                        <div class="audio-bar" style="animation-delay: 0.1s;"></div>
+                        <div class="audio-bar" style="animation-delay: 0.3s;"></div>
+                        <div class="audio-bar" style="animation-delay: 0.5s;"></div>
+                        <div class="audio-bar" style="animation-delay: 0.2s;"></div>
+                        <div class="audio-bar" style="animation-delay: 0.4s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 relative overflow-hidden">
+        <div
+            class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-brand-gold/5 pointer-events-none">
+        </div>
+
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h2 class="font-display text-5xl md:text-6xl font-bold mb-8">Ready to Scale?</h2>
+            <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                Stop losing viewers to boring edits. Let's create content that demands attention.
+            </p>
+
+            <a href="mailto:chipotletatad@gmail.com"
+                class="inline-flex items-center gap-3 px-10 py-5 bg-white text-black font-bold rounded-full text-lg hover:bg-brand-gold transition-colors shadow-xl shadow-white/5">
+                <span class="material-symbols-outlined">mail</span>
+                chipotletatad@gmail.com
+            </a>
+
+            <div class="mt-16 flex justify-center gap-8">
+                <a href="https://www.facebook.com/sweetpotatoe.elmaco" target="_blank" rel="noopener noreferrer"
+                    class="text-gray-500 hover:text-brand-gold transition-colors">
+                    <span class="text-sm font-bold tracking-widest uppercase">Facebook</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-brand-gold transition-colors">
+                    <span class="text-sm font-bold tracking-widest uppercase">LinkedIn</span>
+                </a>
+                <a href="https://www.instagram.com/thisguydripped/?hl=en" target="_blank" rel="noopener noreferrer"
+                    class="text-gray-500 hover:text-brand-gold transition-colors">
+                    <span class="text-sm font-bold tracking-widest uppercase">Instagram</span>
+                </a>
+            </div>
+
+            <footer class="mt-24 text-gray-600 text-sm">
+                &copy; 2026 Ershad Elmaco. All Rights Reserved.
+            </footer>
+        </div>
+    </section>
+
+    <!-- Theatre Modal (Lightbox) -->
+    <div id="theatre-modal" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300 ease-out">
+        <button id="theatre-modal__close" class="absolute top-6 right-6 z-[210] w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-all duration-200">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <button id="theatre-unmute-btn" class="hidden absolute bottom-6 left-6 z-[210] px-5 py-2.5 rounded-full bg-brand-gold text-black text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-2xl hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-sm">volume_off</span>
+            Unmute Video
+        </button>
+        <div id="theatre-modal__player-wrap" class="relative w-[90vw] max-w-[960px] aspect-video rounded-xl overflow-hidden shadow-2xl shadow-brand-gold/15 scale-95 transition-transform duration-300 ease-out">
+            <!-- Placeholder div that will be replaced by the API -->
+            <div id="theatre-iframe-placeholder" class="w-full h-full"></div>
+        </div>
+        
+        <!-- Fallback Link/Message -->
+        <div id="theatre-modal__fallback" class="mt-6 text-center z-[210] px-4">
+            <p class="text-sm text-gray-400 mb-2">Video player configuration issues on local file systems or mobile?</p>
+            <a id="theatre-modal__fallback-btn" href="#" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-brand-gold text-black font-bold rounded-full hover:bg-yellow-400 transition-colors shadow-lg">
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                Open directly in YouTube
+            </a>
+        </div>
+    </div>
+
+    <!-- Archives Modal -->
+    <div id="archive-modal" class="hidden fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 ease-out">
+        <button id="archive-modal__close" class="absolute top-6 right-6 z-[210] w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-all duration-200">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <div class="relative w-[90vw] max-w-xl p-8 bg-brand-card/90 border border-white/10 rounded-2xl shadow-2xl shadow-brand-gold/5 flex flex-col gap-6">
+            <div class="text-center">
+                <h2 class="font-display text-2xl font-bold text-white mb-2">Production Archives</h2>
+                <p class="text-xs text-gray-400">Premium social productions and archive campaigns</p>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+                <!-- SCUAA Campus Interviews -->
+                <a href="https://www.facebook.com/share/r/182sQFtGVW/" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-display text-sm font-bold text-gray-200 group-hover:text-brand-gold transition-colors">SCUAA Campus Interviews</h3>
+                        <p class="text-xs text-gray-400">Facebook Archive Campaign</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-base flex-shrink-0">open_in_new</span>
+                </a>
+                
+                <!-- First Day of School SDE -->
+                <a href="https://www.facebook.com/share/r/16VDQCkc2d/" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-display text-sm font-bold text-gray-200 group-hover:text-brand-gold transition-colors">First Day of School SDE</h3>
+                        <p class="text-xs text-gray-400">Facebook Archive Campaign</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-base flex-shrink-0">open_in_new</span>
+                </a>
+                
+                <!-- General Orientation Cinematic SDE -->
+                <a href="https://www.facebook.com/share/r/1AWwct7AN1/" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-display text-sm font-bold text-gray-200 group-hover:text-brand-gold transition-colors">General Orientation SDE</h3>
+                        <p class="text-xs text-gray-400">Facebook Archive Campaign</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-base flex-shrink-0">open_in_new</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol === 'file:') {
+                document.getElementById('protocol-warning')?.classList.remove('hidden');
+            }
+
+            // --- 1. Three.js Broken Glass Background ---
+            const initThreeJS = () => {
+                const container = document.getElementById('webgl-bg');
+                if (!container) return;
+
+                const scene = new THREE.Scene();
+                // Add subtle fog to blend distant shards
+                scene.fog = new THREE.FogExp2(0x050505, 0.05);
+
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // optimize for mobile
+
+                // Important: Set clear color here since CSS body is transparent
+                renderer.setClearColor(0x050505, 1);
+
+                container.appendChild(renderer.domElement);
+
+                // Lighting
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
+
+                const pointLight = new THREE.PointLight(0xd4af37, 2, 50); // Gold light
+                pointLight.position.set(5, 5, 5);
+                scene.add(pointLight);
+
+                const blueLight = new THREE.PointLight(0x4287f5, 1, 50); // Cool contrast light
+                blueLight.position.set(-5, -5, 5);
+                scene.add(blueLight);
+
+                // Shards (Broken Glass)
+                const shards = [];
+                const shardGeometry = new THREE.IcosahedronGeometry(1, 0); // Low poly for sharp edges
+
+                // Glass Material
+                const glassMaterial = new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    metalness: 0.1,
+                    roughness: 0.1,
+                    transmission: 0.9, // Glass-like transparency
+                    transparent: true,
+                    opacity: 0.8,
+                    side: THREE.DoubleSide
+                });
+
+                // Create random shards
+                for (let i = 0; i < 35; i++) {
+                    const mesh = new THREE.Mesh(shardGeometry, glassMaterial);
+
+                    // Random positions
+                    mesh.position.x = (Math.random() - 0.5) * 30;
+                    mesh.position.y = (Math.random() - 0.5) * 30;
+                    mesh.position.z = (Math.random() - 0.5) * 15 - 5; // Mostly behind
+
+                    // Random rotation
+                    mesh.rotation.x = Math.random() * Math.PI;
+                    mesh.rotation.y = Math.random() * Math.PI;
+
+                    // Random scale
+                    const scale = Math.random() * 0.8 + 0.2;
+                    mesh.scale.set(scale, scale, scale);
+
+                    // Custom properties for animation
+                    // REDUCED SPEEDS (Previously 0.005)
+                    mesh.userData = {
+                        rotSpeedX: (Math.random() - 0.5) * 0.002,
+                        rotSpeedY: (Math.random() - 0.5) * 0.002,
+                        floatSpeed: (Math.random() * 0.002) + 0.001,
+                        yOffset: Math.random() * Math.PI * 2
+                    };
+
+                    scene.add(mesh);
+                    shards.push(mesh);
+                }
+
+                camera.position.z = 10;
+
+                // Mouse interaction
+                let mouseX = 0;
+                let mouseY = 0;
+                let targetX = 0;
+                let targetY = 0;
+                const windowHalfX = window.innerWidth / 2;
+                const windowHalfY = window.innerHeight / 2;
+
+                document.addEventListener('mousemove', (event) => {
+                    mouseX = (event.clientX - windowHalfX) * 0.001;
+                    mouseY = (event.clientY - windowHalfY) * 0.001;
+                });
+
+                // Animation Loop
+                const clock = new THREE.Clock();
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+
+                    const elapsedTime = clock.getElapsedTime();
+
+                    // REDUCED SENSITIVITY (Previously multiplied by 2)
+                    targetX = mouseX * 0.1;
+                    targetY = mouseY * 0.1;
+
+                    // Smooth camera movement
+                    camera.rotation.x += 0.05 * (targetY - camera.rotation.x);
+                    camera.rotation.y += 0.05 * (targetX - camera.rotation.y);
+
+                    // Animate shards
+                    shards.forEach(shard => {
+                        shard.rotation.x += shard.userData.rotSpeedX;
+                        shard.rotation.y += shard.userData.rotSpeedY;
+
+                        // Floating effect
+                        shard.position.y += Math.sin(elapsedTime + shard.userData.yOffset) * shard.userData.floatSpeed;
+                    });
+
+                    renderer.render(scene, camera);
+                };
+
+                animate();
+
+                // Handle Resize
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            };
+
+            // Initialize WebGL
+            initThreeJS();
+
+            // --- GSAP ScrollTrigger Overhaul JS ---
+            gsap.registerPlugin(ScrollTrigger);
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReducedMotion) {
+                // Skip all ScrollTrigger timelines, set final states directly
+                gsap.set('#hero-sizzle-container', { scale: 0.9, borderRadius: '24px' });
+                gsap.set('.video-card', { opacity: 1, y: 0 });
+                gsap.set('.pillar-title', { opacity: 1, y: 0 });
+                gsap.utils.toArray('.skill-bar-fill').forEach(fill => {
+                    const level = fill.getAttribute('data-skill-level') || '0';
+                    gsap.set(fill, { scaleX: level });
+                });
+            } else {
+                // --- PHASE A: Hero Pin-and-Scale ---
+                const heroTL = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#hero-viewport',
+                        start: 'top top',
+                        end: '+=150%',
+                        pin: true,
+                        scrub: 1,
+                        anticipatePin: 1,
+                        invalidateOnRefresh: true,
+                    }
+                });
+
+                heroTL
+                    .to('#hero-sizzle-container', {
+                        scale: 0.9,
+                        borderRadius: '24px',
+                        ease: 'power1.inOut',
+                        duration: 1,
+                    }, 0)
+                    .to('#hero-viewport', {
+                        backgroundColor: '#050505',
+                        ease: 'power2.out',
+                        duration: 1,
+                    }, 0)
+                    .to('.hero-text', {
+                        opacity: 0,
+                        y: -30,
+                        ease: 'power2.in',
+                        duration: 0.5,
+                    }, 0);
+
+                // --- PHASE B: Horizontal Scroll (Desktop Only) ---
+                ScrollTrigger.matchMedia({
+                    // ── DESKTOP ──────────────────────────────────
+                    '(min-width: 768px)': function () {
+                        const panels = gsap.utils.toArray('.horizontal-panel');
+
+                        const horizontalTween = gsap.to('#horizontal-section', {
+                            x: () => -(document.querySelector('#horizontal-section').scrollWidth - window.innerWidth),
+                            ease: 'none',
+                            scrollTrigger: {
+                                trigger: '#scroll-wrapper',
+                                start: 'top top',
+                                end: () => '+=' + (document.querySelector('#horizontal-section').scrollWidth - window.innerWidth),
+                                pin: true,
+                                scrub: 1,
+                                anticipatePin: 1,
+                                invalidateOnRefresh: true,
+                                snap: {
+                                    snapTo: 1 / (panels.length - 1),
+                                    duration: { min: 0.2, max: 0.6 },
+                                    ease: 'power1.inOut',
+                                },
+                            }
+                        });
+
+                        // Staggered horizontal animations for all video and Facebook cards
+                        gsap.utils.toArray('.video-card, .fb-archive-card').forEach(card => {
+                            gsap.to(card, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                ease: 'power2.out',
+                                scrollTrigger: {
+                                    trigger: card,
+                                    containerAnimation: horizontalTween,
+                                    start: 'left 90%',
+                                    toggleActions: 'play none none none',
+                                }
+                            });
+                        });
+
+                        // Horizontal animation for category section headers (Pillar Titles)
+                        gsap.utils.toArray('.pillar-title').forEach(title => {
+                            gsap.to(title, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.7,
+                                ease: 'power3.out',
+                                scrollTrigger: {
+                                    trigger: title,
+                                    containerAnimation: horizontalTween,
+                                    start: 'left 85%',
+                                    toggleActions: 'play none none none',
+                                }
+                            });
+                        });
+                    },
+
+                    // ── MOBILE ───────────────────────────────────
+                    '(max-width: 767px)': function () {
+                        gsap.utils.toArray('.horizontal-panel').forEach(panel => {
+                            gsap.from(panel, {
+                                opacity: 0,
+                                y: 40,
+                                duration: 0.8,
+                                ease: 'power2.out',
+                                scrollTrigger: {
+                                    trigger: panel,
+                                    start: 'top 85%',
+                                    toggleActions: 'play none none none',
+                                },
+                            });
+                        });
+
+                        // Staggered vertical animations for all video and Facebook cards on mobile
+                        gsap.utils.toArray('.video-card, .fb-archive-card').forEach(card => {
+                            gsap.to(card, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                ease: 'power2.out',
+                                scrollTrigger: {
+                                    trigger: card,
+                                    start: 'top 90%',
+                                    toggleActions: 'play none none none',
+                                }
+                            });
+                        });
+
+                        // Vertical animation for category section headers (Pillar Titles) on mobile
+                        gsap.utils.toArray('.pillar-title').forEach(title => {
+                            gsap.to(title, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.7,
+                                ease: 'power3.out',
+                                scrollTrigger: {
+                                    trigger: title,
+                                    start: 'top 85%',
+                                    toggleActions: 'play none none none',
+                                }
+                            });
+                        });
+                    },
+                });
+
+                // --- SERVICES SECTION STAGGER ---
+                ScrollTrigger.batch('#services .glass-panel', {
+                    start: 'top 85%',
+                    onEnter: (batch) => {
+                        gsap.fromTo(batch,
+                            { opacity: 0, y: 25, scale: 0.97 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                scale: 1,
+                                duration: 0.5,
+                                ease: 'power2.out',
+                                stagger: 0.1,
+                            }
+                        );
+                    },
+                    once: true,
+                });
+
+                // --- SERVICES SKILL BARS ANIMATION ---
+                gsap.utils.toArray('.skill-bar-fill').forEach(fill => {
+                    const level = fill.getAttribute('data-skill-level') || '0';
+                    gsap.to(fill, {
+                        scaleX: level,
+                        duration: 1.5,
+                        ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: '#services',
+                            start: 'top 80%',
+                            toggleActions: 'play none none none'
+                        }
+                    });
+                });
+
+                // --- CONTACT SECTION PARALLAX ---
+                gsap.from('#contact h2', {
+                    y: 40,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: '#contact',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+
+                gsap.from('#contact p', {
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.6,
+                    delay: 0.15,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: '#contact',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+
+            // --- THEATRE MODAL LOGIC & POSTMESSAGE PLAYBACK CONTROL ---
+            const theatreModal = document.getElementById('theatre-modal');
+            const playerWrap  = document.getElementById('theatre-modal__player-wrap');
+            const closeBtn    = document.getElementById('theatre-modal__close');
+            const unmuteBtn   = document.getElementById('theatre-unmute-btn');
+            let isMuted = true;
+
+            function openVideo(videoId) {
+                const isShort = videoId !== 'cPLIGshFkHo'; // only gameplay is horizontal 16:9
+                const isLocalFile = window.location.protocol === 'file:';
+                
+                // Construct embed URL with API commands enabled
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&modestbranding=1&controls=1&enablejsapi=1`;
+
+                if (isShort) {
+                    playerWrap.style.aspectRatio = '9 / 16';
+                    playerWrap.style.maxWidth = '400px';
+                } else {
+                    playerWrap.style.aspectRatio = '16 / 9';
+                    playerWrap.style.maxWidth = '960px';
+                }
+
+                // Inject iframe directly with autoplay permissions and enablejsapi=1
+                playerWrap.innerHTML = `<iframe id="theatre-iframe" class="w-full h-full border-none" src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+                
+                // Dynamic fallback link update
+                const fallbackBtn = document.getElementById('theatre-modal__fallback-btn');
+                const fallbackBtnWrap = document.getElementById('theatre-modal__fallback');
+                if (fallbackBtn) {
+                    fallbackBtn.href = `https://youtube.com/watch?v=${videoId}`;
+                }
+                
+                if (isLocalFile) {
+                    fallbackBtnWrap?.classList.add('animate-pulse-slow');
+                } else {
+                    fallbackBtnWrap?.classList.remove('animate-pulse-slow');
+                }
+
+                // Show unmute button and ensure it is reset
+                isMuted = true;
+                if (unmuteBtn) {
+                    unmuteBtn.classList.remove('hidden');
+                    unmuteBtn.innerHTML = `
+                        <span class="material-symbols-outlined text-sm">volume_off</span>
+                        Unmute Video
+                    `;
+                }
+
+                // Overlay transition using Tailwind classes
+                theatreModal.classList.remove('opacity-0', 'pointer-events-none');
+                theatreModal.classList.add('opacity-100', 'pointer-events-auto');
+                playerWrap.classList.remove('scale-95');
+                playerWrap.classList.add('scale-100');
+                
+                document.body.style.overflow = 'hidden';
+            }
+
+            const openTheatre = openVideo;
+
+            function closeTheatre() {
+                // Destroy iframe to stop video and audio playback immediately
+                playerWrap.innerHTML = '';
+
+                // Hide and reset unmute button
+                isMuted = true;
+                if (unmuteBtn) {
+                    unmuteBtn.classList.add('hidden');
+                    unmuteBtn.innerHTML = `
+                        <span class="material-symbols-outlined text-sm">volume_off</span>
+                        Unmute Video
+                    `;
+                }
+
+                // Overlay transition using Tailwind classes
+                theatreModal.classList.remove('opacity-100', 'pointer-events-auto');
+                theatreModal.classList.add('opacity-0', 'pointer-events-none');
+                playerWrap.classList.remove('scale-100');
+                playerWrap.classList.add('scale-95');
+                
+                document.body.style.overflow = '';
+                setTimeout(() => { 
+                    const fallbackBtnWrap = document.getElementById('theatre-modal__fallback');
+                    fallbackBtnWrap?.classList.remove('animate-pulse-slow');
+                }, 300);
+            }
+
+            // PostMessage Hover Listeners
+            if (playerWrap) {
+                playerWrap.addEventListener('mouseenter', () => {
+                    const iframe = document.getElementById('theatre-iframe');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                    }
+                });
+
+                playerWrap.addEventListener('mouseleave', () => {
+                    const iframe = document.getElementById('theatre-iframe');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                    }
+                });
+            }
+
+            // Unmute Button Click Listener
+            if (unmuteBtn) {
+                unmuteBtn.addEventListener('click', () => {
+                    const iframe = document.getElementById('theatre-iframe');
+                    if (iframe && iframe.contentWindow) {
+                        if (isMuted) {
+                            iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                            isMuted = false;
+                            unmuteBtn.innerHTML = `
+                                <span class="material-symbols-outlined text-sm">volume_up</span>
+                                Mute Video
+                            `;
+                        } else {
+                            iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+                            isMuted = true;
+                            unmuteBtn.innerHTML = `
+                                <span class="material-symbols-outlined text-sm">volume_off</span>
+                                Unmute Video
+                            `;
+                        }
+                    }
+                });
+            }
+
+            document.querySelectorAll('.video-card[data-video-id]').forEach(card => {
+                card.addEventListener('click', () => {
+                    openVideo(card.getAttribute('data-video-id'));
+                });
+            });
+
+            if (closeBtn) closeBtn.addEventListener('click', closeTheatre);
+            theatreModal.addEventListener('click', (e) => {
+                if (e.target === theatreModal) closeTheatre();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !theatreModal.classList.contains('opacity-0')) closeTheatre();
+            });
+
+            // Prevent background scroll on iOS when modal is open
+            theatreModal.addEventListener('touchmove', (e) => {
+                if (e.target === theatreModal) e.preventDefault();
+            }, { passive: false });
+
+            // --- ARCHIVES MODAL LOGIC ---
+            const archiveModal = document.getElementById('archive-modal');
+            const navArchivesBtn = document.getElementById('nav-archives-btn');
+            const archiveCloseBtn = document.getElementById('archive-modal__close');
+
+            if (navArchivesBtn && archiveModal) {
+                navArchivesBtn.addEventListener('click', () => {
+                    archiveModal.classList.remove('hidden');
+                    // trigger reflow so browser registers the transition
+                    void archiveModal.offsetWidth;
+                    archiveModal.classList.add('opacity-100');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+
+            function closeArchive() {
+                if (archiveModal) {
+                    archiveModal.classList.remove('opacity-100');
+                    document.body.style.overflow = '';
+                    setTimeout(() => {
+                        archiveModal.classList.add('hidden');
+                    }, 300);
+                }
+            }
+
+            if (archiveCloseBtn) archiveCloseBtn.addEventListener('click', closeArchive);
+            if (archiveModal) {
+                archiveModal.addEventListener('click', (e) => {
+                    if (e.target === archiveModal) closeArchive();
+                });
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && archiveModal && !archiveModal.classList.contains('hidden') && archiveModal.classList.contains('opacity-100')) {
+                    closeArchive();
+                }
+            });
+
+            // Refresh ScrollTrigger to recalculate heights
+            ScrollTrigger.refresh();
+        });
+    </script>
+</body>
+
+</html>
