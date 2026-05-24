@@ -14,6 +14,8 @@
     <!-- GSAP & ScrollTrigger -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <!-- YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api" async></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1107,8 +1109,7 @@
             Unmute Video
         </button>
         <div id="theatre-modal__player-wrap" class="relative w-[90vw] max-w-[960px] aspect-video rounded-xl overflow-hidden shadow-2xl shadow-brand-gold/15 scale-95 transition-transform duration-300 ease-out">
-            <!-- Placeholder div that will be replaced by the API -->
-            <div id="theatre-iframe-placeholder" class="w-full h-full"></div>
+            <div id="theatre-player-target" class="w-full h-full"></div>
         </div>
         
         <!-- Fallback Link/Message -->
@@ -1527,19 +1528,39 @@
                 });
             }
 
-            // --- THEATRE MODAL LOGIC & POSTMESSAGE PLAYBACK CONTROL ---
+            // --- THEATRE MODAL LOGIC & YOUTUBE PLAYER SDK ---
             const theatreModal = document.getElementById('theatre-modal');
             const playerWrap  = document.getElementById('theatre-modal__player-wrap');
             const closeBtn    = document.getElementById('theatre-modal__close');
             const unmuteBtn   = document.getElementById('theatre-unmute-btn');
-            let isMuted = true;
+
+            let ytPlayerInstance = null;
+            let isPlayerReady = false;
+
+            // The global callback entry hook required by the YouTube SDK bootstrap process
+            window.onYouTubeIframeAPIReady = function() {
+                ytPlayerInstance = new YT.Player('theatre-player-target', {
+                    height: '100%',
+                    width: '100%',
+                    playerVars: {
+                        'autoplay': 1,
+                        'mute': 1,
+                        'loop': 1,
+                        'rel': 0,
+                        'controls': 1,
+                        'modestbranding': 1,
+                        'enablejsapi': 1,
+                        'origin': window.location.origin
+                    },
+                    events: {
+                        'onReady': () => { isPlayerReady = true; }
+                    }
+                });
+            };
 
             function openVideo(videoId) {
                 const isShort = videoId !== 'cPLIGshFkHo'; // only gameplay is horizontal 16:9
                 const isLocalFile = window.location.protocol === 'file:';
-                
-                // Construct embed URL with API commands enabled
-                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&modestbranding=1&controls=1&enablejsapi=1`;
 
                 if (isShort) {
                     playerWrap.style.aspectRatio = '9 / 16';
@@ -1549,16 +1570,20 @@
                     playerWrap.style.maxWidth = '960px';
                 }
 
-                // Inject the iframe with explicit browser permission delegation attributes
-                playerWrap.innerHTML = `
-                    <iframe 
-                        id="theatre-iframe" 
-                        class="w-full h-full border-none" 
-                        src="${embedUrl}" 
-                        allow="autoplay; encrypted-media; picture-in-picture; fullscreen" 
-                        allowfullscreen>
-                    </iframe>
-                `;
+                // Synchronously fire video loading through the persistent API bridge hook
+                if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+                    ytPlayerInstance.loadVideoById({
+                        videoId: videoId,
+                        startSeconds: 0
+                    });
+                    ytPlayerInstance.mute(); // Enforce mute rules strictly inside the gesture thread
+                } else {
+                    // Robust micro-fallback for race conditions during initial frame boots
+                    const fallbackIframe = document.querySelector('#theatre-modal__player-wrap iframe');
+                    if (fallbackIframe) {
+                        fallbackIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&modestbranding=1&controls=1&enablejsapi=1`;
+                    }
+                }
                 
                 // Dynamic fallback link update
                 const fallbackBtn = document.getElementById('theatre-modal__fallback-btn');
@@ -1574,7 +1599,6 @@
                 }
 
                 // Show unmute button and ensure it is reset
-                isMuted = true;
                 if (unmuteBtn) {
                     unmuteBtn.classList.remove('hidden');
                     unmuteBtn.innerHTML = `
@@ -1595,11 +1619,11 @@
             const openTheatre = openVideo;
 
             function closeTheatre() {
-                // Destroy player frame to stop all data streams immediately
-                playerWrap.innerHTML = '';
+                if (ytPlayerInstance && typeof ytPlayerInstance.stopVideo === 'function') {
+                    ytPlayerInstance.stopVideo();
+                }
 
                 // Hide and reset unmute button
-                isMuted = true;
                 if (unmuteBtn) {
                     unmuteBtn.classList.add('hidden');
                     unmuteBtn.innerHTML = `
@@ -1624,18 +1648,15 @@
             // Unmute Button Click Listener
             if (unmuteBtn) {
                 unmuteBtn.addEventListener('click', () => {
-                    const iframe = document.getElementById('theatre-iframe');
-                    if (iframe && iframe.contentWindow) {
-                        if (isMuted) {
-                            iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', 'https://www.youtube.com');
-                            isMuted = false;
+                    if (ytPlayerInstance && typeof ytPlayerInstance.isMuted === 'function') {
+                        if (ytPlayerInstance.isMuted()) {
+                            ytPlayerInstance.unMute();
                             unmuteBtn.innerHTML = `
                                 <span class="material-symbols-outlined text-sm">volume_up</span>
                                 Mute Video
                             `;
                         } else {
-                            iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', 'https://www.youtube.com');
-                            isMuted = true;
+                            ytPlayerInstance.mute();
                             unmuteBtn.innerHTML = `
                                 <span class="material-symbols-outlined text-sm">volume_off</span>
                                 Unmute Video
