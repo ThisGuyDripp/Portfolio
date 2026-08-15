@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ershad Elmaco | High-Retention Video Editor</title>
+    <meta name="description"
+        content="Portfolio of Ershad Elmaco. Specializing in high-retention VSLs, UGC, and viral short-form content.">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js for WebGL Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <!-- YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api" async></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#d4af37',
+                            dark: '#050505',
+                            card: '#121212',
+                            gray: '#1f1f1f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* FIXED: Body background must be transparent for WebGL (z-index: -1) to show through */
+        html {
+            background-color: #050505;
+            /* Solid fallback for repaint glitches */
+        }
+
+        body {
+            background-color: transparent;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            /* Prevent horizontal scroll on body */
+        }
+
+        /* WebGL Container - Fixed background */
+        #webgl-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #050505;
+        }
+
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Desktop Hover Effects */
+        @media (hover: hover) {
+            .glass-panel:hover {
+                border-color: rgba(212, 175, 55, 0.3);
+                box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+                transform: translateY(-2px);
+            }
+        }
+
+        .tab-btn.active {
+            background-color: #d4af37;
+            color: black;
+            border-color: #d4af37;
+        }
+
+        .nav-link {
+            transition: all 0.25s ease;
+        }
+
+        .nav-link.active {
+            background-color: #d4af37 !important;
+            color: #050505 !important;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.35);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .cta-pop-in {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- GSAP ScrollTrigger Overhaul CSS --- */
+        :root {
+            --color-bg-primary: #050505;
+            --color-bg-charcoal: #0a0a0a;
+            --color-bg-card: #121212;
+            --color-gold: #d4af37;
+            --color-gold-20: rgba(212, 175, 55, 0.2);
+            --hero-scale: 1;
+            --hero-radius: 0px;
+            --hero-opacity: 1;
+            --section-bg: #050505;
+        }
+
+        html {
+            overscroll-behavior: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        #hero-viewport {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            will-change: transform;
+        }
+
+        #hero-sizzle-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            transform-origin: center center;
+            border-radius: var(--hero-radius);
+            overflow: hidden;
+            will-change: transform, border-radius;
+            background-color: #050505;
+        }
+
+        #hero-sizzle-container .hero-vignette {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.4) 100%);
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        #hero-sizzle-container .hero-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        #scroll-wrapper {
+            position: relative;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        #horizontal-section {
+            position: relative;
+            height: 100vh;
+            width: 300vw;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        .horizontal-panel {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 3rem;
+            position: relative;
+            flex-shrink: 0;
+            background-color: transparent;
+            overflow: hidden;
+        }
+
+        @media (max-width: 767px) {
+            #horizontal-section {
+                width: 100% !important;
+                height: auto !important;
+                flex-direction: column !important;
+            }
+            .horizontal-panel {
+                width: 100% !important;
+                height: auto !important;
+                min-height: auto !important;
+                padding: 4rem 1rem 2rem !important;
+            }
+        }
+
+        .pillar-grid {
+            display: grid;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+
+        .pillar-grid--quad {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .pillar-grid--three {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .pillar-grid--mixed {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto;
+        }
+
+        .pillar-grid--mixed .video-card--wide {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 767px) {
+            .pillar-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.75rem !important;
+            }
+            .video-card--wide {
+                grid-column: 1 / -1 !important;
+            }
+            .video-card--wide .video-card__thumb-wrap {
+                aspect-ratio: 16 / 9 !important;
+            }
+            .video-card__meta {
+                padding: 0.65rem 0.75rem !important;
+            }
+            .video-card__meta h3 {
+                font-size: 0.875rem !important;
+                line-height: 1.25 !important;
+            }
+            .video-card__badge {
+                font-size: 0.55rem !important;
+                padding: 0.15rem 0.4rem !important;
+                margin-bottom: 0.25rem !important;
+            }
+        }
+
+        /* Replace the old .video-card declaration with this */
+        .video-card {
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (hover: hover) {
+            .video-card:hover {
+                border-color: rgba(212, 175, 55, 0.5);
+                box-shadow: 0 12px 35px -10px rgba(212, 175, 55, 0.2);
+                transform: translateY(-4px);
+            }
+        }
+
+        .video-card__thumb-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9 / 16;
+            overflow: hidden;
+            background: linear-gradient(45deg, #0f0f0f, #1a1a1a);
+            transition: transform 0.3s ease;
+        }
+
+        .video-card__thumb-wrap--landscape {
+            aspect-ratio: 16 / 9;
+        }
+
+        .video-card__thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        @media (hover: hover) {
+            .video-card:hover .video-card__thumb {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .video-card__play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 40;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        @media (hover: none) {
+            .video-card__play {
+                background-color: var(--color-gold) !important;
+                color: black !important;
+                border-color: var(--color-gold) !important;
+            }
+        }
+
+        @media (hover: hover) {
+            .video-card:hover .video-card__play {
+                background-color: var(--color-gold);
+                color: black;
+                border-color: var(--color-gold);
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        .video-card__meta {
+            padding: 1rem 1.25rem;
+        }
+
+        .video-card__badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 0.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-card__badge--vsl     { background: var(--color-gold); color: black; }
+        .video-card__badge--ugc     { background: var(--color-gold); color: black; }
+        .video-card__badge--corp    { background: #2563eb; color: white; }
+        .video-card__badge--ai      { background: #dc2626; color: white; }
+        .video-card__badge--shorts  { background: #9333ea; color: white; }
+        .video-card__badge--archive { background: #059669; color: white; }
+
+        .pillar-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .pillar-title__accent {
+            color: var(--color-gold);
+        }
+
+        .pillar-watermark {
+            position: absolute;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.02);
+            pointer-events: none;
+            line-height: 1;
+            z-index: 0;
+        }
+
+        /* Desktop Height Constraints and Spacing Adjustments */
+        @media (min-width: 768px) {
+            .horizontal-panel {
+                padding-top: 6.5rem;
+                padding-bottom: 3.5rem;
+                justify-content: center;
+            }
+            .pillar-title {
+                margin-bottom: 1.25rem;
+            }
+            .video-card__thumb-wrap {
+                max-height: 30vh;
+                width: auto;
+                aspect-ratio: 9 / 16;
+                margin: 0 auto;
+            }
+            .video-card__thumb-wrap--landscape {
+                aspect-ratio: 16 / 9;
+            }
+            .video-card__meta {
+                padding: 0.6rem 0.8rem;
+            }
+            .video-card__meta h3 {
+                font-size: 0.95rem !important;
+            }
+            .video-card__badge {
+                padding: 0.15rem 0.4rem;
+                font-size: 0.55rem;
+                margin-bottom: 0.35rem;
+            }
+        }
+
+        /* Skill Bar & Audio Waveform Styles */
+        .skill-bar-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            background: #d4af37;
+            border-radius: 999px;
+            transform: scaleX(0);
+            transform-origin: left;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .audio-wave-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 24px;
+        }
+
+        .audio-bar {
+            width: 3px;
+            background: #d4af37;
+            border-radius: 999px;
+            animation: wavePulse 1.2s ease-in-out infinite alternate;
+            animation-play-state: paused;
+        }
+
+        .glass-panel:hover .audio-bar {
+            animation-play-state: running;
+        }
+
+        @keyframes wavePulse {
+            0% { height: 4px; }
+            100% { height: 20px; }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Zero-Chrome Video Masking: Hides YouTube branding, controls, and share overlays */
+        .clean-preview-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050505;
+            border-radius: inherit;
+        }
+
+        .clean-preview-wrapper iframe {
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            pointer-events: none;
+            border: 0;
+        }
+
+        /* Theatre Modal Zero-Chrome Crop Mask */
+        #theatre-modal__player-wrap {
+            position: relative;
+            overflow: hidden;
+            background-color: #000000;
+        }
+
+        #theatre-modal__player-wrap iframe,
+        #theatre-player-target iframe,
+        #theatre-player-target {
+            width: 100% !important;
+            height: 100% !important;
+            transform: scale(1.08); /* Scales video slightly to push edge overlays out of frame */
+            transform-origin: center center;
+        }
+
+        /* Custom Play/Pause Overlay Indicator */
+        #theatre-click-surface {
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            cursor: pointer;
+        }
+
+        #theatre-play-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #theatre-play-indicator.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-brand-gold selection:text-black">
+    <div id="protocol-warning" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[250] w-[90%] max-w-lg bg-red-950/80 backdrop-blur-md border border-red-500/30 text-red-200 px-4 py-3 rounded-xl text-center text-xs font-medium shadow-2xl shadow-red-900/10">
+        ⚠️ Running via local file protocol. Some YouTube embeds may throw Error 150. Use a local development server or live-reload preview for local testing.
+    </div>
+
+    <!-- WebGL Canvas for "Broken Glass" Effect -->
+    <div id="webgl-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md">
+        <div
+            class="glass-panel rounded-full px-4 sm:px-6 py-2.5 sm:py-3 flex justify-between items-center shadow-2xl shadow-brand-gold/10">
+            <a href="#" class="font-display font-bold text-base sm:text-lg tracking-tight text-white flex-shrink-0">ERSHAD<span
+                    class="text-brand-gold">.</span></a>
+            <div class="flex gap-1.5 sm:gap-4 text-xs sm:text-sm font-medium text-gray-400 items-center">
+                <a href="#campaign-focus" class="nav-link px-2.5 sm:px-3 py-1 rounded-full hover:text-white transition-all">Work</a>
+                <a href="#services" class="nav-link px-2.5 sm:px-3 py-1 rounded-full hover:text-white transition-all">Services</a>
+                <a href="#contact" class="nav-link px-2.5 sm:px-3 py-1 rounded-full hover:text-white transition-all">Contact</a>
+                <button id="nav-archives-btn" class="hover:text-white transition-colors px-1.5 sm:px-2 py-1">Archives</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with GSAP Scale-Down Pinning -->
+    <div id="hero-viewport">
+        <div id="hero-sizzle-container">
+            <div class="hero-vignette"></div>
+            <video 
+                id="hero-video-loop"
+                class="w-full h-full object-cover opacity-60 pointer-events-none"
+                autoplay 
+                muted 
+                loop 
+                playsinline
+                poster="https://img.youtube.com/vi/cPLIGshFkHo/maxresdefault.jpg">
+                <source src="showreel.mp4" type="video/mp4">
+            </video>
+            <div class="hero-text absolute inset-0 flex flex-col justify-center items-center z-30 text-center pointer-events-none px-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 animate-pulse-slow backdrop-blur-sm">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-xs uppercase tracking-widest text-gray-300">Available for 2026 Season</span>
+                </div>
+                <h1 class="font-display text-6xl md:text-8xl font-bold leading-tight mb-6 drop-shadow-2xl">
+                    Turn Viewers Into <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-yellow-200">Obsessed Fans.</span>
+                </h1>
+                <p class="font-sans text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow-md">
+                    Retention Editor & Visual Storyteller. Converting passive scrollers into high-value clients and obsessed audiences through dynamic VSLs, UGC ads, and cinematic commercial editing.
+                </p>
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-white/5 backdrop-blur-md text-brand-gold text-xs uppercase tracking-widest font-semibold animate-pulse-slow">
+                    <span class="material-symbols-outlined text-sm">mouse</span>
+                    Scroll to Enter Cinema
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Focus Gateway -->
+    <section id="campaign-focus" class="py-20 relative z-20">
+        <div class="container mx-auto px-6 max-w-6xl text-center">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand-gold/30 bg-brand-gold/10 text-brand-gold text-xs uppercase tracking-widest font-bold mb-4">
+                <span class="material-symbols-outlined text-sm">view_in_ar</span> Specialized Production Tracks
+            </div>
+            <h2 class="font-display text-4xl md:text-6xl font-bold text-white mb-4">Choose Your Campaign Focus</h2>
+            <p class="text-gray-400 text-sm md:text-base max-w-xl mx-auto mb-4">
+                Select a dedicated editing pipeline engineered for direct-response conversions or viral social engagement.
+            </p>
+            
+            <!-- Mobile/Tablet Instruction Pill -->
+            <div class="md:hidden inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-brand-gold text-xs mb-8">
+                <span class="material-symbols-outlined text-sm">touch_app</span>
+                Tap to preview &bull; Double-tap to explore track
+            </div>
+
+            <!-- Dual Gateway Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mt-4 relative">
+                <!-- Track 1: A.I Ecommerce Meta Ads -->
+                <div id="track-ecom" class="focus-card glass-panel p-8 rounded-3xl cursor-pointer border border-white/10 hover:border-brand-gold/50 transition-all duration-300 relative group overflow-hidden" data-track="ecom">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
+                            <span class="material-symbols-outlined text-2xl">smart_toy</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-brand-gold">Conversion Engine</span>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold text-white mb-2 group-hover:text-brand-gold transition-colors">A.I Ecommerce Meta Ads</h3>
+                    <p class="text-sm text-gray-400 mb-8 leading-relaxed">
+                        High-converting AI UGC ads, kinetic voiceover + B-roll systems, photorealistic greenscreen AI avatars, and hyper-stylized 3D Pixar & claymation creative engines.
+                    </p>
+                    <div class="flex items-center justify-between pt-6 border-t border-white/10">
+                        <span class="text-xs text-brand-gold font-bold flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-brand-gold"></span> 11 AI Production Formats</span>
+                        <span class="text-sm font-bold text-white flex items-center gap-1 group-hover:translate-x-1 transition-transform">Explore Track &rarr;</span>
+                    </div>
+                </div>
+
+                <!-- Track 2: Reels, Social Media & Meta Ads -->
+                <div id="track-social" class="focus-card glass-panel p-8 rounded-3xl cursor-pointer border border-white/10 hover:border-brand-gold/50 transition-all duration-300 relative group overflow-hidden" data-track="social">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
+                            <span class="material-symbols-outlined text-2xl">bolt</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-gray-300">Viral Velocity</span>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold text-white mb-2 group-hover:text-brand-gold transition-colors">Reels, Social Media & Meta Ads</h3>
+                    <p class="text-sm text-gray-400 mb-8 leading-relaxed">
+                        Cinematic speed ramps, executive talking head retention edits, luxury real estate walkthroughs, and institutional corporate showcases.
+                    </p>
+                    <div class="flex items-center justify-between pt-6 border-t border-white/10">
+                        <span class="text-xs text-brand-gold font-bold flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-brand-gold"></span> 10 High-Impact Formats</span>
+                        <span class="text-sm font-bold text-white flex items-center gap-1 group-hover:translate-x-1 transition-transform">Explore Track &rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Random Popout Preview Container -->
+        <div id="portal-floating-popout" class="fixed pointer-events-none z-[150] w-64 md:w-72 aspect-[9/16] rounded-2xl overflow-hidden glass-panel border-2 border-brand-gold shadow-2xl shadow-brand-gold/30 opacity-0 scale-90 transition-all duration-300">
+            <div class="clean-preview-wrapper w-full h-full relative">
+                <iframe id="portal-popout-iframe" class="w-full h-full border-0 pointer-events-none" src="" allow="autoplay; encrypted-media"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dynamic Bento Showcase (Hidden until a track is chosen) -->
+    <section id="showcase-section" class="hidden opacity-0 py-20 transition-all duration-700 min-h-screen relative z-10">
+        <div class="container mx-auto px-6 max-w-7xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 pb-6 border-b border-white/10">
+                <div>
+                    <button id="back-to-focus-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-brand-gold hover:bg-brand-gold hover:text-black transition-all text-xs font-bold uppercase tracking-wider mb-4">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span> Switch Track
+                    </button>
+                    <h2 id="showcase-track-title" class="font-display text-3xl md:text-5xl font-bold text-white"></h2>
+                </div>
+                <p class="text-gray-400 text-sm max-w-md">
+                    Continuous zero-chrome live previews. Click any card to launch the full Theatre Lightbox with audio.
+                </p>
+            </div>
+
+            <!-- Injected Cards Target (6-Column Compact Grid) -->
+            <div id="bento-grid-target" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5"></div>
+        </div>
+    </section>
+
+    <!-- Services / Technical Stack (Updated: Interactive Tool Stack & Skill Visualizers) -->
+    <section id="services" class="py-24 bg-transparent relative">
+        <div class="container mx-auto px-6 relative z-10">
+            <h2 class="font-display text-4xl font-bold mb-12 text-center text-white">Engineering Visuals</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1: Adobe Premiere Pro -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <!-- Premium Adobe Premiere Pro Inline SVG vector icon -->
+                            <svg class="w-8 h-8 group-hover:scale-110 transition-transform flex-shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="28" height="28" rx="6" fill="#0c071e" stroke="#4949FF" stroke-width="1.5"/>
+                                <text x="16" y="20" fill="#9090FF" font-family="'Inter', sans-serif" font-weight="bold" font-size="13" text-anchor="middle">Pr</text>
+                            </svg>
+                            <h3 class="font-bold text-lg text-white">Adobe Premiere Pro</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Advanced multi-cam synchronization, dynamic pacing, and precision timeline assembly for high-retention campaigns.</p>
+                    </div>
+                    <div class="mt-auto pt-2">
+                        <div class="flex justify-between items-center text-xs font-semibold text-gray-300 mb-1.5">
+                            <span>Pacing & Retention</span>
+                            <span class="text-brand-gold font-bold">99%</span>
+                        </div>
+                        <div class="skill-bar-track">
+                            <div class="skill-bar-fill" data-skill-level="0.99"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: CapCut Desktop -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <!-- Premium CapCut Desktop Inline SVG vector icon -->
+                            <svg class="w-8 h-8 group-hover:scale-110 transition-transform flex-shrink-0 text-brand-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                <path d="M14.5 9.5 12 12l2.5 2.5"/>
+                                <path d="M9.5 12h5"/>
+                            </svg>
+                            <h3 class="font-bold text-lg text-white">CapCut Desktop</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Rapid-turnaround short-form engineering, viral pacing mechanics, kinetic typography, and retention-optimized visual hooks.</p>
+                    </div>
+                    <div class="mt-auto pt-2">
+                        <div class="flex justify-between items-center text-xs font-semibold text-gray-300 mb-1.5">
+                            <span>Workflow Velocity</span>
+                            <span class="text-brand-gold font-bold">95%</span>
+                        </div>
+                        <div class="skill-bar-track">
+                            <div class="skill-bar-fill" data-skill-level="0.95"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Google Flow -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <svg class="w-8 h-8 group-hover:scale-110 transition-transform flex-shrink-0 text-brand-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3v18M3 12h18M12 3a9 9 0 0 1 9 9M12 3a9 9 0 0 0-9 9M12 21a9 9 0 0 1 9-9M12 21a9 9 0 0 0-9 9"/>
+                                <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                            </svg>
+                            <h3 class="font-bold text-lg text-white">Google Flow</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Generative video production, visual flow automation, custom transition masks, and AI B-roll generation.</p>
+                    </div>
+                    <div class="mt-auto pt-2">
+                        <div class="flex justify-between items-center text-xs font-semibold text-gray-300 mb-1.5">
+                            <span>AI Asset Generation</span>
+                            <span class="text-brand-gold font-bold">92%</span>
+                        </div>
+                        <div class="skill-bar-track">
+                            <div class="skill-bar-fill" data-skill-level="0.92"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: ElevenLabs -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">graphic_eq</span>
+                            <h3 class="font-bold text-lg text-white">ElevenLabs</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Vocal synthesis & high-retention VSL voiceovers with perfectly timed pacing.</p>
+                    </div>
+                    <div class="mt-auto pt-2 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-gray-300">Auditory Retention: 96%</span>
+                        <div class="audio-wave-container">
+                            <div class="audio-bar" style="animation-delay: 0.1s;"></div>
+                            <div class="audio-bar" style="animation-delay: 0.3s;"></div>
+                            <div class="audio-bar" style="animation-delay: 0.5s;"></div>
+                            <div class="audio-bar" style="animation-delay: 0.2s;"></div>
+                            <div class="audio-bar" style="animation-delay: 0.4s;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: HeyGen -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">face</span>
+                            <h3 class="font-bold text-lg text-white">HeyGen (Avatar 5)</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">Photorealistic UGC realism, script segmentation for facial coherence, and batch hook testing.</p>
+                    </div>
+                    <div class="skill-bar-track mt-auto">
+                        <div class="skill-bar-fill" data-skill-level="0.95"></div>
+                    </div>
+                </div>
+
+                <!-- Card 6: Higgsfield -->
+                <div class="glass-panel p-6 rounded-2xl border-t border-brand-gold/20 hover:bg-white/5 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="material-symbols-outlined text-3xl text-brand-gold group-hover:scale-110 transition-transform">hub</span>
+                            <h3 class="font-bold text-lg text-white">Higgsfield Cluster</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">Visual locking techniques to prevent morphing/hallucinations, maintaining high sequence fidelity.</p>
+                    </div>
+                    <div class="skill-bar-track mt-auto">
+                        <div class="skill-bar-fill" data-skill-level="0.90"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 relative overflow-hidden">
+        <div
+            class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-brand-gold/5 pointer-events-none">
+        </div>
+
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h2 class="font-display text-5xl md:text-6xl font-bold mb-8">Ready to Scale?</h2>
+            <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                Ready to eliminate drop-off and scale your engagement? Let’s engineer content that drives measurable conversions.
+            </p>
+
+            <a href="mailto:chipotletatad@gmail.com"
+                class="inline-flex items-center gap-3 px-10 py-5 bg-white text-black font-bold rounded-full text-lg hover:bg-brand-gold transition-colors shadow-xl shadow-white/5">
+                <span class="material-symbols-outlined">mail</span>
+                chipotletatad@gmail.com
+            </a>
+
+            <!-- Contact Links: OnlineJobs.ph & WhatsApp -->
+            <div class="mt-16 flex flex-wrap justify-center items-center gap-4 sm:gap-6">
+                <!-- OnlineJobs.ph Profile -->
+                <a href="https://v2.onlinejobs.ph/jobseekers/info/4524441" target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-black hover:bg-brand-gold hover:border-brand-gold transition-all duration-300 group shadow-lg">
+                    <span class="material-symbols-outlined text-lg text-brand-gold group-hover:text-black transition-colors">badge</span>
+                    <span class="text-xs sm:text-sm font-bold tracking-wider uppercase">OnlineJobs.ph Profile</span>
+                </a>
+
+                <!-- WhatsApp Direct Link -->
+                <a href="https://wa.me/639687358968" target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-black hover:bg-brand-gold hover:border-brand-gold transition-all duration-300 group shadow-lg">
+                    <span class="material-symbols-outlined text-lg text-brand-gold group-hover:text-black transition-colors">chat</span>
+                    <span class="text-xs sm:text-sm font-bold tracking-wider uppercase">WhatsApp: +63 968 735 8968</span>
+                </a>
+            </div>
+
+            <footer class="mt-24 text-gray-600 text-sm">
+                &copy; 2026 Ershad Elmaco. All Rights Reserved.
+            </footer>
+        </div>
+    </section>
+
+    <!-- Theatre Modal (Lightbox) -->
+    <div id="theatre-modal" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300 ease-out">
+        <button id="theatre-modal__close" class="absolute top-6 right-6 z-[210] w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-all duration-200" aria-label="Close theatre mode">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <button id="theatre-unmute-btn" class="hidden absolute bottom-6 left-6 z-[210] px-4 py-2.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-gray-300 hover:text-white hover:border-brand-gold/50 text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-all cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+            <span class="material-symbols-outlined text-base">volume_off</span>
+            <span>Muted</span>
+        </button>
+        
+        <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 w-full max-w-5xl z-[205] px-4 md:px-6 h-[90vh] md:h-auto overflow-y-auto md:overflow-visible no-scrollbar">
+            <div id="modal-panel-left" class="flex flex-col p-4 md:p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md w-full md:w-64 max-w-sm md:max-w-none opacity-0 flex-shrink-0 text-center md:text-left">
+                <span class="text-[10px] text-brand-gold uppercase tracking-widest font-bold mb-1">Campaign Performance</span>
+                <h4 id="modal-text-left" class="font-display text-lg font-bold text-white leading-tight"></h4>
+            </div>
+
+            <div id="theatre-modal__player-wrap" class="relative w-[90vw] max-w-[920px] aspect-video rounded-xl overflow-hidden shadow-2xl shadow-brand-gold/15 scale-95 transition-all duration-300 ease-out flex-shrink-0 bg-[#080808]">
+                <!-- Subtle Pulse Spinner Loader -->
+                <div id="theatre-player-loader" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 pointer-events-none">
+                    <div class="w-10 h-10 rounded-full border-2 border-brand-gold/20 border-t-brand-gold animate-spin"></div>
+                    <span class="text-[11px] uppercase tracking-widest text-gray-400 mt-3 font-semibold">Loading Stream...</span>
+                </div>
+
+                <!-- Clickable Surface for Clean Play/Pause -->
+                <div id="theatre-click-surface">
+                    <div id="theatre-play-indicator" class="w-16 h-16 rounded-full bg-black/70 border border-brand-gold/40 text-brand-gold flex items-center justify-center shadow-2xl backdrop-blur-md">
+                        <span id="theatre-play-icon" class="material-symbols-outlined text-3xl">pause</span>
+                    </div>
+                </div>
+
+                <!-- Target Iframe -->
+                <div id="theatre-player-target" class="w-full h-full"></div>
+            </div>
+
+            <div id="modal-panel-right" class="flex flex-col p-4 md:p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md w-full md:w-64 max-w-sm md:max-w-none opacity-0 flex-shrink-0 text-center md:text-left">
+                <span class="text-[10px] text-brand-gold uppercase tracking-widest font-bold mb-1">Editing & Execution</span>
+                <h4 id="modal-text-right" class="font-display text-sm text-gray-300 leading-relaxed"></h4>
+            </div>
+        </div>
+        
+        <!-- Fallback Link/Message -->
+        <div id="theatre-modal__fallback" class="mt-6 text-center z-[210] px-4">
+            <p class="text-sm text-gray-400 mb-2">Video player configuration issues on local file systems or mobile?</p>
+            <a id="theatre-modal__fallback-btn" href="#" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-brand-gold text-black font-bold rounded-full hover:bg-yellow-400 transition-colors shadow-lg">
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                Open directly in YouTube
+            </a>
+        </div>
+    </div>
+
+    <!-- Archives Modal -->
+    <div id="archive-modal" class="hidden fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 ease-out">
+        <button id="archive-modal__close" class="absolute top-6 right-6 z-[210] w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-all duration-200">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <div class="relative w-[90vw] max-w-xl p-8 bg-brand-card/90 border border-white/10 rounded-2xl shadow-2xl shadow-brand-gold/5 flex flex-col gap-6">
+            <div class="text-center">
+                <h2 class="font-display text-2xl font-bold text-white mb-2">Production Archives</h2>
+                <p class="text-xs text-gray-400">Premium social productions and archive campaigns</p>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+                <!-- SCUAA Campus Interviews -->
+                <a href="https://www.facebook.com/share/r/182sQFtGVW/" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-display text-sm font-bold text-gray-200 group-hover:text-brand-gold transition-colors">SCUAA Campus Interviews</h3>
+                        <p class="text-xs text-gray-400">Facebook Archive Campaign</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-base flex-shrink-0">open_in_new</span>
+                </a>
+                
+                <!-- First Day of School SDE -->
+                <a href="https://www.facebook.com/share/r/16VDQCkc2d/" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-display text-sm font-bold text-gray-200 group-hover:text-brand-gold transition-colors">First Day of School SDE</h3>
+                        <p class="text-xs text-gray-400">Facebook Archive Campaign</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-base flex-shrink-0">open_in_new</span>
+                </a>
+                
+                <!-- General Orientation Cinematic SDE -->
+                <a href="https://www.facebook.com/share/r/1AWwct7AN1/" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-display text-sm font-bold text-gray-200 group-hover:text-brand-gold transition-colors">General Orientation SDE</h3>
+                        <p class="text-xs text-gray-400">Facebook Archive Campaign</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-base flex-shrink-0">open_in_new</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables and callback for the YouTube Iframe Player SDK to prevent race conditions
+        let ytPlayerInstance = null;
+        let isPlayerReady = false;
+
+        function hidePlayerLoader() {
+            const loader = document.getElementById('theatre-player-loader');
+            if (loader) {
+                loader.classList.add('opacity-0', 'pointer-events-none');
+                loader.classList.remove('opacity-100');
+            }
+        }
+
+        function showPlayerLoader() {
+            const loader = document.getElementById('theatre-player-loader');
+            if (loader) {
+                loader.classList.remove('opacity-0', 'pointer-events-none');
+                loader.classList.add('opacity-100');
+            }
+        }
+
+        window.onYouTubeIframeAPIReady = function() {
+            ytPlayerInstance = new YT.Player('theatre-player-target', {
+                height: '100%',
+                width: '100%',
+                playerVars: {
+                    'autoplay': 1,
+                    'mute': 1,
+                    'loop': 1,
+                    'rel': 0,
+                    'controls': 0, // Disable native YouTube controls & share buttons
+                    'showinfo': 0,
+                    'modestbranding': 1,
+                    'enablejsapi': 1,
+                    'iv_load_policy': 3,
+                    'disablekb': 1,
+                    'origin': window.location.origin
+                },
+                events: {
+                    'onReady': () => {
+                        isPlayerReady = true;
+                        hidePlayerLoader();
+                    },
+                    'onStateChange': (event) => {
+                        if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.BUFFERING) {
+                            hidePlayerLoader();
+                        }
+                    }
+                }
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol === 'file:') {
+                document.getElementById('protocol-warning')?.classList.remove('hidden');
+            }
+
+            // --- 1. Three.js Broken Glass Background ---
+            const initThreeJS = () => {
+                const container = document.getElementById('webgl-bg');
+                if (!container) return;
+
+                const isMobile = window.innerWidth < 768;
+
+                const scene = new THREE.Scene();
+                // Add subtle fog to blend distant shards
+                scene.fog = new THREE.FogExp2(0x050505, 0.05);
+
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isMobile });
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                // Cap pixel ratio to 1.5 on mobile to prevent 3x retina overdraw
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+
+                // Important: Set clear color here since CSS body is transparent
+                renderer.setClearColor(0x050505, 1);
+
+                container.appendChild(renderer.domElement);
+
+                // Lighting
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
+
+                const pointLight = new THREE.PointLight(0xd4af37, 2, 50); // Gold light
+                pointLight.position.set(5, 5, 5);
+                scene.add(pointLight);
+
+                const blueLight = new THREE.PointLight(0x4287f5, 1, 50); // Cool contrast light
+                blueLight.position.set(-5, -5, 5);
+                scene.add(blueLight);
+
+                // Shards (Broken Glass)
+                const shards = [];
+                const shardGeometry = new THREE.IcosahedronGeometry(1, 0); // Low poly for sharp edges
+
+                // Material Optimization: MeshStandardMaterial on mobile/low-power, MeshPhysicalMaterial on desktop
+                const glassMaterial = isMobile
+                    ? new THREE.MeshStandardMaterial({
+                        color: 0xffffff,
+                        metalness: 0.8,
+                        roughness: 0.2,
+                        transparent: true,
+                        opacity: 0.75,
+                        side: THREE.DoubleSide
+                    })
+                    : new THREE.MeshPhysicalMaterial({
+                        color: 0xffffff,
+                        metalness: 0.1,
+                        roughness: 0.1,
+                        transmission: 0.9, // Glass-like transparency
+                        transparent: true,
+                        opacity: 0.8,
+                        side: THREE.DoubleSide
+                    });
+
+                // Shard count throttled for mobile (14 shards vs 35 on desktop)
+                const shardCount = isMobile ? 14 : 35;
+
+                for (let i = 0; i < shardCount; i++) {
+                    const mesh = new THREE.Mesh(shardGeometry, glassMaterial);
+
+                    // Random positions
+                    mesh.position.x = (Math.random() - 0.5) * 30;
+                    mesh.position.y = (Math.random() - 0.5) * 30;
+                    mesh.position.z = (Math.random() - 0.5) * 15 - 5; // Mostly behind
+
+                    // Random rotation
+                    mesh.rotation.x = Math.random() * Math.PI;
+                    mesh.rotation.y = Math.random() * Math.PI;
+
+                    // Random scale
+                    const scale = Math.random() * 0.8 + 0.2;
+                    mesh.scale.set(scale, scale, scale);
+
+                    // Custom properties for animation
+                    // REDUCED SPEEDS (Previously 0.005)
+                    mesh.userData = {
+                        rotSpeedX: (Math.random() - 0.5) * 0.002,
+                        rotSpeedY: (Math.random() - 0.5) * 0.002,
+                        floatSpeed: (Math.random() * 0.002) + 0.001,
+                        yOffset: Math.random() * Math.PI * 2
+                    };
+
+                    scene.add(mesh);
+                    shards.push(mesh);
+                }
+
+                camera.position.z = 10;
+
+                // Mouse interaction
+                let mouseX = 0;
+                let mouseY = 0;
+                let targetX = 0;
+                let targetY = 0;
+                const windowHalfX = window.innerWidth / 2;
+                const windowHalfY = window.innerHeight / 2;
+
+                document.addEventListener('mousemove', (event) => {
+                    mouseX = (event.clientX - windowHalfX) * 0.001;
+                    mouseY = (event.clientY - windowHalfY) * 0.001;
+                });
+
+                // Animation Loop
+                const clock = new THREE.Clock();
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+
+                    const elapsedTime = clock.getElapsedTime();
+
+                    // REDUCED SENSITIVITY (Previously multiplied by 2)
+                    targetX = mouseX * 0.1;
+                    targetY = mouseY * 0.1;
+
+                    // Smooth camera movement
+                    camera.rotation.x += 0.05 * (targetY - camera.rotation.x);
+                    camera.rotation.y += 0.05 * (targetX - camera.rotation.y);
+
+                    // Animate shards
+                    shards.forEach(shard => {
+                        shard.rotation.x += shard.userData.rotSpeedX;
+                        shard.rotation.y += shard.userData.rotSpeedY;
+
+                        // Floating effect
+                        shard.position.y += Math.sin(elapsedTime + shard.userData.yOffset) * shard.userData.floatSpeed;
+                    });
+
+                    renderer.render(scene, camera);
+                };
+
+                animate();
+
+                // Debounced Viewport Resize Listener
+                let resizeDebounceTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeDebounceTimer);
+                    resizeDebounceTimer = setTimeout(() => {
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        const currentMobile = window.innerWidth < 768;
+                        renderer.setPixelRatio(Math.min(window.devicePixelRatio, currentMobile ? 1.5 : 2));
+                    }, 150);
+                });
+            };
+
+            // Initialize WebGL
+            initThreeJS();
+
+            // --- GSAP ScrollTrigger Overhaul JS ---
+            gsap.registerPlugin(ScrollTrigger);
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReducedMotion) {
+                // Skip all ScrollTrigger timelines, set final states directly
+                gsap.set('#hero-sizzle-container', { scale: 0.9, borderRadius: '24px' });
+                gsap.set('.video-card', { opacity: 1, y: 0 });
+                gsap.set('.pillar-title', { opacity: 1, y: 0 });
+                gsap.utils.toArray('.skill-bar-fill').forEach(fill => {
+                    const level = fill.getAttribute('data-skill-level') || '0';
+                    gsap.set(fill, { scaleX: level });
+                });
+            } else {
+                // --- PHASE A: Hero Pin-and-Scale (Desktop Only) ---
+                ScrollTrigger.matchMedia({
+                    // ── DESKTOP ──────────────────────────────────
+                    '(min-width: 768px)': function () {
+                        const heroTL = gsap.timeline({
+                            scrollTrigger: {
+                                trigger: '#hero-viewport',
+                                start: 'top top',
+                                end: '+=150%',
+                                pin: true,
+                                scrub: 1,
+                                anticipatePin: 1,
+                                invalidateOnRefresh: true,
+                            }
+                        });
+
+                        heroTL
+                            .to('#hero-sizzle-container', {
+                                scale: 0.9,
+                                borderRadius: '24px',
+                                ease: 'power1.inOut',
+                                duration: 1,
+                            }, 0)
+                            .to('#hero-viewport', {
+                                backgroundColor: '#050505',
+                                ease: 'power2.out',
+                                duration: 1,
+                            }, 0)
+                            .to('.hero-text', {
+                                opacity: 0,
+                                y: -30,
+                                ease: 'power2.in',
+                                duration: 0.5,
+                            }, 0);
+                    }
+                });
+
+                // --- CAMPAIGN FOCUS GATEWAY STAGGER ---
+                ScrollTrigger.batch('#campaign-focus .focus-card', {
+                    start: 'top 85%',
+                    onEnter: (batch) => {
+                        gsap.fromTo(batch,
+                            { opacity: 0, y: 30, scale: 0.97 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                scale: 1,
+                                duration: 0.6,
+                                ease: 'power2.out',
+                                stagger: 0.15,
+                            }
+                        );
+                    },
+                    once: true,
+                });
+
+                // --- SERVICES SECTION STAGGER ---
+                ScrollTrigger.batch('#services .glass-panel', {
+                    start: 'top 85%',
+                    onEnter: (batch) => {
+                        gsap.fromTo(batch,
+                            { opacity: 0, y: 25, scale: 0.97 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                scale: 1,
+                                duration: 0.5,
+                                ease: 'power2.out',
+                                stagger: 0.1,
+                            }
+                        );
+                    },
+                    once: true,
+                });
+
+                // --- SERVICES SKILL BARS ANIMATION ---
+                gsap.utils.toArray('.skill-bar-fill').forEach(fill => {
+                    const level = fill.getAttribute('data-skill-level') || '0';
+                    gsap.to(fill, {
+                        scaleX: level,
+                        duration: 1.5,
+                        ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: '#services',
+                            start: 'top 80%',
+                            toggleActions: 'play none none none'
+                        }
+                    });
+                });
+
+                // --- CONTACT SECTION PARALLAX ---
+                gsap.from('#contact h2', {
+                    y: 40,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: '#contact',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+
+                gsap.from('#contact p', {
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.6,
+                    delay: 0.15,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: '#contact',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+
+            // --- ACTIVE SCROLLSPY NAVIGATION ---
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            function setActiveNav(sectionId) {
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href === `#${sectionId}`) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+
+            const spySections = ['campaign-focus', 'services', 'contact'];
+            spySections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    ScrollTrigger.create({
+                        trigger: el,
+                        start: 'top 45%',
+                        end: 'bottom 45%',
+                        onEnter: () => setActiveNav(id),
+                        onEnterBack: () => setActiveNav(id),
+                        onLeave: (self) => {
+                            if (id === 'campaign-focus' && self.direction === -1) {
+                                setActiveNav('');
+                            }
+                        }
+                    });
+                }
+            });
+
+            // --- THEATRE MODAL LOGIC & YOUTUBE PLAYER SDK ---
+            const theatreModal = document.getElementById('theatre-modal');
+            const playerWrap  = document.getElementById('theatre-modal__player-wrap');
+            const closeBtn    = document.getElementById('theatre-modal__close');
+            const unmuteBtn   = document.getElementById('theatre-unmute-btn');
+
+            function updateAudioButtonState(isMuted) {
+                if (!unmuteBtn) return;
+                if (isMuted) {
+                    unmuteBtn.className = "absolute bottom-6 left-6 z-[210] px-4 py-2.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-gray-300 hover:text-white hover:border-brand-gold/50 text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-all cursor-pointer";
+                    unmuteBtn.innerHTML = `
+                        <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                        <span class="material-symbols-outlined text-base">volume_off</span>
+                        <span>Muted</span>
+                    `;
+                } else {
+                    unmuteBtn.className = "absolute bottom-6 left-6 z-[210] px-4 py-2.5 rounded-full bg-brand-gold text-black border border-brand-gold text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 shadow-2xl shadow-brand-gold/30 hover:scale-105 transition-all cursor-pointer";
+                    unmuteBtn.innerHTML = `
+                        <span class="w-2 h-2 rounded-full bg-green-950 animate-pulse"></span>
+                        <span class="material-symbols-outlined text-base">volume_up</span>
+                        <span>Volume ON</span>
+                    `;
+                }
+            }
+
+            function openVideo(videoId) {
+                const cardEl = document.querySelector(`.video-card[data-video-id="${videoId}"]`);
+                const aspectRatio = cardEl ? (cardEl.getAttribute('data-aspect-ratio') || '9:16') : '9:16';
+                const isShort = aspectRatio === '9:16';
+                const isLocalFile = window.location.protocol === 'file:';
+
+                // 1. Dynamic Aspect Ratio Detection & Sizing
+                if (isShort) {
+                    playerWrap.style.aspectRatio = '9 / 16';
+                    playerWrap.style.maxWidth = '380px';
+                } else {
+                    playerWrap.style.aspectRatio = '16 / 9';
+                    playerWrap.style.maxWidth = '920px';
+                }
+
+                // 2. Synchronous Fallback Link Assignment
+                const fallbackBtn = document.getElementById('theatre-modal__fallback-btn');
+                const fallbackBtnWrap = document.getElementById('theatre-modal__fallback');
+                if (fallbackBtn) {
+                    fallbackBtn.href = `https://youtube.com/watch?v=${videoId}`;
+                }
+
+                if (isLocalFile) {
+                    fallbackBtnWrap?.classList.add('animate-pulse-slow');
+                } else {
+                    fallbackBtnWrap?.classList.remove('animate-pulse-slow');
+                }
+
+                // 3. Show Loading Skeleton State
+                showPlayerLoader();
+
+                // 4. Query matching metadata fields
+                const campaignMatch = (typeof ecommerceVideos !== 'undefined' && typeof metaReelsVideos !== 'undefined')
+                    ? ecommerceVideos.concat(metaReelsVideos).find(v => v.id === videoId || v.youtubeId === videoId)
+                    : null;
+                const leftText = cardEl ? cardEl.getAttribute('data-metric-left') : (campaignMatch ? campaignMatch.metric : '');
+                const rightText = cardEl ? cardEl.getAttribute('data-metric-right') : (campaignMatch ? campaignMatch.highlight : '');
+
+                document.getElementById('modal-text-left').innerHTML = leftText || 'Premium Production';
+                document.getElementById('modal-text-right').innerHTML = rightText || 'Advanced Visual Flow';
+
+                // 5. Synchronously fire video loading through API bridge hook or iframe fallback
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&controls=0&showinfo=0&iv_load_policy=3&disablekb=1&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+
+                if (playIcon) playIcon.textContent = 'pause';
+                if (playIndicator) playIndicator.classList.remove('active');
+
+                if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+                    ytPlayerInstance.loadVideoById({
+                        videoId: videoId,
+                        startSeconds: 0
+                    });
+                    ytPlayerInstance.mute(); // Enforce muted state inside user gesture context
+                } else {
+                    const fallbackIframe = document.querySelector('#theatre-modal__player-wrap iframe');
+                    if (fallbackIframe) {
+                        fallbackIframe.src = embedUrl;
+                        fallbackIframe.onload = () => { hidePlayerLoader(); };
+                    }
+                }
+
+                // Fallback timeout to hide loader if YouTube event is slow or blocked
+                setTimeout(() => { hidePlayerLoader(); }, 1800);
+
+                // 6. Reset and Display Audio State Button
+                if (unmuteBtn) {
+                    unmuteBtn.classList.remove('hidden');
+                    updateAudioButtonState(true);
+                }
+
+                // 7. Overlay transition using Tailwind classes
+                theatreModal.classList.remove('opacity-0', 'pointer-events-none');
+                theatreModal.classList.add('opacity-100', 'pointer-events-auto');
+                playerWrap.classList.remove('scale-95');
+                playerWrap.classList.add('scale-100');
+
+                // 8. GSAP side-slide transitions based on viewport size
+                const isMobileViewport = window.innerWidth < 768;
+
+                if (leftText || rightText) {
+                    if (isMobileViewport) {
+                        gsap.fromTo('#modal-panel-left',  { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, delay: 0.15, ease: 'power2.out' });
+                        gsap.fromTo('#modal-panel-right', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, delay: 0.15, ease: 'power2.out' });
+                    } else {
+                        gsap.fromTo('#modal-panel-left',  { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, delay: 0.2, ease: 'power3.out' });
+                        gsap.fromTo('#modal-panel-right', { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, delay: 0.2, ease: 'power3.out' });
+                    }
+                }
+                
+                document.body.style.overflow = 'hidden';
+            }
+
+            const openTheatre = openVideo;
+
+            function closeTheatre() {
+                if (ytPlayerInstance && typeof ytPlayerInstance.stopVideo === 'function') {
+                    ytPlayerInstance.stopVideo();
+                }
+
+                // Hide and reset unmute button
+                if (unmuteBtn) {
+                    unmuteBtn.classList.add('hidden');
+                    updateAudioButtonState(true);
+                }
+
+                hidePlayerLoader();
+
+                // Overlay transition using Tailwind classes
+                theatreModal.classList.remove('opacity-100', 'pointer-events-auto');
+                theatreModal.classList.add('opacity-0', 'pointer-events-none');
+                playerWrap.classList.remove('scale-100');
+                playerWrap.classList.add('scale-95');
+
+                const isMobileViewport = window.innerWidth < 768;
+                // Close Reset: Reset panel properties back to baseline hidden values
+                gsap.set('#modal-panel-left', { opacity: 0, x: isMobileViewport ? 0 : -40, y: isMobileViewport ? -20 : 0 });
+                gsap.set('#modal-panel-right', { opacity: 0, x: isMobileViewport ? 0 : 40, y: isMobileViewport ? 20 : 0 });
+                
+                document.body.style.overflow = '';
+                setTimeout(() => { 
+                    const fallbackBtnWrap = document.getElementById('theatre-modal__fallback');
+                    fallbackBtnWrap?.classList.remove('animate-pulse-slow');
+                }, 300);
+            }
+
+            // Play/Pause Toggle Logic on Clean Click Surface
+            const clickSurface = document.getElementById('theatre-click-surface');
+            const playIndicator = document.getElementById('theatre-play-indicator');
+            const playIcon = document.getElementById('theatre-play-icon');
+
+            if (clickSurface) {
+                clickSurface.addEventListener('click', () => {
+                    if (!ytPlayerInstance || typeof ytPlayerInstance.getPlayerState !== 'function') return;
+                    
+                    const state = ytPlayerInstance.getPlayerState();
+                    if (state === YT.PlayerState.PLAYING) {
+                        ytPlayerInstance.pauseVideo();
+                        if (playIcon) playIcon.textContent = 'play_arrow';
+                        if (playIndicator) playIndicator.classList.add('active');
+                    } else {
+                        ytPlayerInstance.playVideo();
+                        if (playIcon) playIcon.textContent = 'pause';
+                        if (playIndicator) {
+                            playIndicator.classList.add('active');
+                            setTimeout(() => {
+                                playIndicator.classList.remove('active');
+                            }, 600);
+                        }
+                    }
+                });
+            }
+
+            // Unmute Button Click Listener
+            if (unmuteBtn) {
+                unmuteBtn.addEventListener('click', () => {
+                    if (ytPlayerInstance && typeof ytPlayerInstance.isMuted === 'function') {
+                        if (ytPlayerInstance.isMuted()) {
+                            ytPlayerInstance.unMute();
+                            updateAudioButtonState(false);
+                        } else {
+                            ytPlayerInstance.mute();
+                            updateAudioButtonState(true);
+                        }
+                    }
+                });
+            }
+
+            // 1. Production Video Datasets (Exact Verified Catalog: 11 AI + 10 Social)
+            const trackLibraries = {
+                // TRACK 1: A.I Ecommerce Meta Ads (11 Fully AI & VSL Videos)
+                ecom: [
+                    { id: 'HP0mwxCNMoI', title: 'UGC Product Showcase', badge: 'AI UGC', metric: 'Avatar 5 • Photorealistic UGC Realism', aspect: '9:16' },
+                    { id: 'KPCIDy8e1Vg', title: 'UGC Product Showcase', badge: 'AI UGC', metric: 'Dynamic Hook & Product Integration', aspect: '9:16' },
+                    { id: 'kbKMss-Etgo', title: 'UGC Ad', badge: 'AI UGC', metric: 'Script Segmentation & Expression Locking', aspect: '9:16' },
+                    { id: 'TH9XKEPxF1Q', title: 'UGC Ad', badge: 'AI UGC', metric: 'High-Retention Direct Response Hook', aspect: '9:16' },
+                    { id: 'W4EZxVC1ma4', title: 'Avatar Ad', badge: 'AI Avatar', metric: 'Greenscreen Script Sync & Lip Matching', aspect: '9:16' },
+                    { id: 'FaBwFNETQ2I', title: 'Skeleton Ad', badge: 'Skeleton Ad', metric: 'Retention Structure & Visual Pacing', aspect: '9:16' },
+                    { id: 'ib0r4vyvVx8', title: 'Pixar Style Ad', badge: '3D Pixar', metric: 'Higgsfield Visual Lock & 3D Stylization', aspect: '9:16' },
+                    { id: 'GbIO_yqYP54', title: 'VSL Campaign — High Retention', badge: 'VSL', metric: '65% Retention Rate • Rapid Pacing', aspect: '9:16' },
+                    { id: 'u0h5kLsBeFA', title: 'UGC VSL Asset Development', badge: 'UGC VSL', metric: '40% Increase in Engagement', aspect: '9:16' },
+                    { id: 'honXnuby9OQ', title: 'Generative AI Video Production', badge: 'AI VSL', metric: 'Google Flow • Automated Flow', aspect: '9:16' },
+                    { id: '2nuzdKu2r1k', title: 'Advanced AI Workflow Automation', badge: 'HeyGen', metric: 'Custom Masks & Cinematic B-Roll Sync', aspect: '9:16' }
+                ],
+
+                // TRACK 2: Reels, Social Media & Meta Ads (10 Non-AI, Speed Ramps & Social Formats)
+                social: [
+                    { id: 'uArWbRr3xDY', title: 'Event Highlights', badge: 'Social Media', metric: 'Cinematic Recap & Rhythm Cuts', aspect: '9:16' },
+                    { id: 'MkKHHu-xaWE', title: 'Social Media', badge: 'Social Media', metric: 'Dynamic Engagement & Motion Pacing', aspect: '9:16' },
+                    { id: 'bt9riy1RdfM', title: 'Meta Ad Real Estate', badge: 'Meta Ad', metric: 'Direct Response Walkthrough & Hook', aspect: '9:16' },
+                    { id: 'dlOzDGhKINo', title: 'Premium Real Estate Walkthrough', badge: 'Real Estate', metric: 'Phone Footage • Smooth Cuts', aspect: '9:16' },
+                    { id: 'wOKvf4_xyuo', title: 'Luxury Property Walkthrough', badge: 'Real Estate', metric: 'Smooth Handheld Stabilization', aspect: '9:16' },
+                    { id: 'mNpPd-e0Stk', title: 'Executive Talking Head', badge: 'Reels', metric: 'Micro-Cuts & Advanced Audio Design', aspect: '9:16' },
+                    { id: 'ql2P7xAj8Xs', title: 'Viral Presentation Showcase', badge: 'Shorts', metric: '5K+ Organic Views 1st Week', aspect: '9:16' },
+                    { id: 'gzi9n2tPnOE', title: 'Premium Beverage Showcase', badge: 'Commercial', metric: 'Speed Ramps & Color Grade', aspect: '9:16' },
+                    { id: 'WZunFxVDESI', title: 'Neurology Service Presentation', badge: 'Corporate', metric: 'Institutional Motion Graphics & Flow', aspect: '9:16' },
+                    { id: 'cPLIGshFkHo', title: 'Long-Form Gameplay Mastercut', badge: 'YouTube', metric: 'Dynamic Cuts & Audio SFX Mix', aspect: '16:9' }
+                ]
+            };
+
+            // 2. DOM Elements
+            const popout = document.getElementById('portal-floating-popout');
+            const popoutIframe = document.getElementById('portal-popout-iframe');
+            const focusCards = document.querySelectorAll('.focus-card');
+            const showcaseSection = document.getElementById('showcase-section');
+            const bentoGridTarget = document.getElementById('bento-grid-target');
+            const trackTitleElem = document.getElementById('showcase-track-title');
+            const backToFocusBtn = document.getElementById('back-to-focus-btn');
+            
+            let lastTap = 0;
+
+            // 3. Support for Drive/Direct Video Embed Fallback
+            function getEmbedUrl(videoId) {
+                if (videoId && videoId.length === 11 && !videoId.includes('/')) {
+                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&enablejsapi=1`;
+                }
+                // Fallback for custom Google Drive / direct uploads
+                return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&modestbranding=1&playsinline=1`;
+            }
+
+            // 4. Random Video Selector
+            function getRandomVideo(trackKey) {
+                const list = trackLibraries[trackKey];
+                if (!list || list.length === 0) return null;
+                return list[Math.floor(Math.random() * list.length)];
+            }
+
+            // 5. Popout Controls
+            function showPopout(trackKey, x, y) {
+                const video = getRandomVideo(trackKey);
+                if (!video || !popoutIframe || !popout) return;
+                popoutIframe.src = getEmbedUrl(video.id);
+                
+                const popX = Math.min(window.innerWidth - 300, Math.max(20, x - 140));
+                const popY = Math.min(window.innerHeight - 450, Math.max(20, y - 200));
+                
+                popout.style.left = `${popX}px`;
+                popout.style.top = `${popY}px`;
+                popout.classList.remove('opacity-0', 'scale-90');
+                popout.classList.add('opacity-100', 'scale-100');
+            }
+
+            function hidePopout() {
+                if (!popout) return;
+                popout.classList.remove('opacity-100', 'scale-100');
+                popout.classList.add('opacity-0', 'scale-90');
+                if (popoutIframe) popoutIframe.src = '';
+            }
+
+            // Render Dynamic 6-Column Grid
+            function renderBentoGrid(trackKey) {
+                const bentoGridTarget = document.getElementById('bento-grid-target');
+                const trackTitleElem = document.getElementById('showcase-track-title');
+                if (!bentoGridTarget || !trackLibraries[trackKey]) return;
+                
+                const videos = trackLibraries[trackKey];
+
+                if (trackTitleElem) {
+                    trackTitleElem.innerHTML = trackKey === 'ecom'
+                        ? 'A.I Ecommerce <span class="text-brand-gold">&</span> Meta Ads Pipeline'
+                        : 'Reels, Social Media <span class="text-brand-gold">&</span> Meta Ads';
+                }
+
+                bentoGridTarget.innerHTML = videos.map(vid => `
+                    <div class="video-card ${vid.aspect === '16:9' ? 'col-span-2 aspect-video' : 'aspect-[9/16]'} relative rounded-xl overflow-hidden glass-panel border border-white/10 hover:border-brand-gold/60 cursor-pointer group"
+                         data-video-id="${vid.id}"
+                         data-metric-left="${vid.title}"
+                         data-metric-right="${vid.metric}"
+                         data-aspect-ratio="${vid.aspect}">
+                        
+                        <!-- Clean Zero-UI Autoplaying Embed -->
+                        <div class="clean-preview-wrapper w-full h-full relative overflow-hidden bg-black">
+                            <iframe 
+                                class="w-[140%] h-[140%] -top-[20%] -left-[20%] absolute pointer-events-none border-0"
+                                src="https://www.youtube.com/embed/${vid.id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${vid.id}&modestbranding=1&playsinline=1&enablejsapi=1" 
+                                loading="lazy" 
+                                allow="autoplay; encrypted-media">
+                            </iframe>
+                        </div>
+
+                        <!-- Gradient Shadow Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none"></div>
+
+                        <!-- Metadata Info -->
+                        <div class="absolute bottom-0 left-0 right-0 p-3 pointer-events-none z-10">
+                            <span class="inline-block px-1.5 py-0.5 rounded bg-brand-gold text-black font-bold text-[9px] uppercase mb-1">
+                                ${vid.badge}
+                            </span>
+                            <h3 class="font-display text-xs md:text-sm font-bold text-white group-hover:text-brand-gold transition-colors truncate">
+                                ${vid.title}
+                            </h3>
+                            <p class="text-[10px] text-gray-300 mt-0.5 truncate">${vid.metric}</p>
+                        </div>
+
+                        <!-- Fullscreen Lightbox Button -->
+                        <div class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:bg-brand-gold group-hover:text-black transition-all">
+                            <span class="material-symbols-outlined text-xs">fullscreen</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Attach Theatre Lightbox Listeners
+                bentoGridTarget.querySelectorAll('.video-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const vidId = card.getAttribute('data-video-id');
+                        if (typeof openVideo === 'function') openVideo(vidId);
+                    });
+                });
+
+                // Smooth Entrance Stagger Animation
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(bentoGridTarget.querySelectorAll('.video-card'), 
+                        { opacity: 0, y: 15, scale: 0.96 },
+                        { opacity: 1, y: 0, scale: 1, duration: 0.35, stagger: 0.04, ease: 'power2.out' }
+                    );
+                }
+            }
+
+            function selectTrack(trackKey) {
+                hidePopout();
+                renderBentoGrid(trackKey);
+
+                if (showcaseSection) {
+                    showcaseSection.classList.remove('hidden');
+                    showcaseSection.classList.remove('opacity-0');
+                    showcaseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    if (typeof ScrollTrigger !== 'undefined') {
+                        ScrollTrigger.refresh();
+                    }
+                }
+            }
+
+            // 6. Interaction Event Handlers
+            focusCards.forEach(card => {
+                const trackKey = card.getAttribute('data-track');
+
+                // Desktop Hover Events
+                card.addEventListener('mouseenter', (e) => {
+                    if (window.innerWidth >= 768) showPopout(trackKey, e.clientX, e.clientY);
+                });
+
+                card.addEventListener('mousemove', (e) => {
+                    if (window.innerWidth >= 768 && popout) {
+                        popout.style.left = `${Math.min(window.innerWidth - 300, e.clientX + 20)}px`;
+                        popout.style.top = `${Math.min(window.innerHeight - 450, e.clientY - 100)}px`;
+                    }
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    if (window.innerWidth >= 768) hidePopout();
+                });
+
+                // Click / Touch Controller
+                card.addEventListener('click', () => {
+                    if (window.innerWidth >= 768) {
+                        selectTrack(trackKey);
+                    } else {
+                        const currentTime = new Date().getTime();
+                        const tapGap = currentTime - lastTap;
+                        
+                        if (tapGap < 400 && tapGap > 0) {
+                            selectTrack(trackKey);
+                            lastTap = 0;
+                        } else {
+                            const rect = card.getBoundingClientRect();
+                            showPopout(trackKey, rect.left + rect.width / 2, rect.top + rect.height / 2);
+                            lastTap = currentTime;
+                        }
+                    }
+                });
+            });
+
+            // Dismiss floating popout when tapping outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.focus-card')) {
+                    hidePopout();
+                }
+            });
+
+            if (backToFocusBtn) {
+                backToFocusBtn.addEventListener('click', () => {
+                    const focusSec = document.getElementById('campaign-focus');
+                    if (focusSec) focusSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            if (closeBtn) closeBtn.addEventListener('click', closeTheatre);
+            theatreModal.addEventListener('click', (e) => {
+                if (e.target === theatreModal) closeTheatre();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !theatreModal.classList.contains('opacity-0')) closeTheatre();
+            });
+
+            // Prevent background scroll on iOS when modal is open
+            theatreModal.addEventListener('touchmove', (e) => {
+                if (e.target === theatreModal) e.preventDefault();
+            }, { passive: false });
+
+            // --- ARCHIVES MODAL LOGIC ---
+            const archiveModal = document.getElementById('archive-modal');
+            const navArchivesBtn = document.getElementById('nav-archives-btn');
+            const archiveCloseBtn = document.getElementById('archive-modal__close');
+
+            if (navArchivesBtn && archiveModal) {
+                navArchivesBtn.addEventListener('click', () => {
+                    archiveModal.classList.remove('hidden');
+                    // trigger reflow so browser registers the transition
+                    void archiveModal.offsetWidth;
+                    archiveModal.classList.add('opacity-100');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+
+            function closeArchive() {
+                if (archiveModal) {
+                    archiveModal.classList.remove('opacity-100');
+                    document.body.style.overflow = '';
+                    setTimeout(() => {
+                        archiveModal.classList.add('hidden');
+                    }, 300);
+                }
+            }
+
+            if (archiveCloseBtn) archiveCloseBtn.addEventListener('click', closeArchive);
+            if (archiveModal) {
+                archiveModal.addEventListener('click', (e) => {
+                    if (e.target === archiveModal) closeArchive();
+                });
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && archiveModal && !archiveModal.classList.contains('hidden') && archiveModal.classList.contains('opacity-100')) {
+                    closeArchive();
+                }
+            });
+
+            // Refresh ScrollTrigger to recalculate heights
+            ScrollTrigger.refresh();
+        });
+    </script>
+</body>
+
+</html>
